@@ -1,11 +1,15 @@
 import requests
 import json
 import os
+from rich import print
 from requests.auth import HTTPBasicAuth
 from newRepoData import newRepoData
 from oldRepoData import oldRepoData
 
-if not os.path.exists("newRepoData.py") or not os.path.exists("oldRepoData.py"):
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+print(f"ROOT_DIR: {ROOT_DIR}")
+
+if not os.path.exists(f"{ROOT_DIR}/newRepoData.py") or not os.path.exists(f"{ROOT_DIR}/oldRepoData.py"):
     print("Please ensure that newRepoData.py and oldRepoData.py are present in the same directory as this script.")
     exit()
 
@@ -24,7 +28,14 @@ old_username = old_data["old_username"]
 old_app_password = old_data["old_app_password"]
 old_is_private = old_data["old_is_private"]
 
+deleted_repo_file_path = f"{ROOT_DIR}/deleted_repos.txt"
+
 repo_name = input("Enter the repository slug: ")
+
+with open(deleted_repo_file_path, "r") as file:
+    deleted_repos = file.read().splitlines()
+if repo_name in deleted_repos:
+    print(f"[red]❌ Repository '{repo_name}' already has been deleted.")
 
 def create_repo():
     url = f"https://api.bitbucket.org/2.0/repositories/{new_workspace}/{repo_name}"
@@ -51,18 +62,24 @@ def cloneOldRepo():
 def push_to_new_repo():
     old_repo_path = os.path.join(os.path.expanduser("~/Downloads"), repo_name + ".git")
     os.chdir(old_repo_path)
-    push_command = f"git push --mirror git@bitbucket.org:blueline2025/bs-bmp-modena.git"
+    push_command = f"git push --mirror git@bitbucket.org:blueline2025/{repo_name}.git"
     print(f"Executing command: {push_command}")
+    agree = input("Do you want to push the changes to the new repo? (y/n): ")
+    if agree.lower() != 'y':
+        print("Push aborted.")
+        return
     os.system(push_command)
 
 def delete_repo():
     url = f"https://api.bitbucket.org/2.0/repositories/{old_workspace}/{repo_name}"
-    response = requests.delete(url, auth=HTTPBasicAuth(old_username, old_app_password))
-    if response.status_code == 204:
-        print(f"✅ Repository '{repo_name}' deleted successfully!")
-    else:
-        print(f"❌ Failed to delete repository. Status code: {response.status_code}")
-        print(response.json())
+    try:
+        response = requests.delete(url, auth=HTTPBasicAuth(old_username, old_app_password))
+        if response.status_code == 204:
+            print(f"✅ Repository '{repo_name}' deleted successfully!")
+            with open(deleted_repo_file_path, "a") as file:
+                file.write(repo_name + "\n")
+    except requests.exceptions.RequestException as e:
+        print(f"[red]❌ An error occurred while trying to delete the repository: {e}")
 
 def list_workspaces(old=False):
     if old:
@@ -111,12 +128,13 @@ def openPermissionsInBrowser(workspace, repo_slug):
     to_push = input("Do you want to push the changes to the new repo? (y/n): ")
     if to_push.lower() == 'y':
         push_to_new_repo()
+        delete_repo()
     else:
         print("Changes not pushed to the new repo.")
 
 if __name__ == "__main__":
-    choose = input("Create a new repo, or push to an existing one? (n/e): ").strip().lower()
-    if choose == 'n':
+    choose = input("Create a new repo, or push to an existing one? (c/p): ").strip().lower()
+    if choose == 'c':
         cloneOldRepo()
         create_repo()
         openPermissionsInBrowser(new_workspace, repo_name)
