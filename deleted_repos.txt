@@ -7,3 +7,4 @@ lm-reggio-calor
 lm-progeo
 bs-campeggio-chisonetto-globar
 bs-fgazzotti
+bs-vite
