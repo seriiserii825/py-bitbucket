@@ -133,13 +133,6 @@ def openPermissionsInBrowser(workspace, repo_slug):
         print("Changes not pushed to the new repo.")
 
 if __name__ == "__main__":
-    choose = input("Create a new repo, or push to an existing one? (c/p): ").strip().lower()
-    if choose == 'c':
-        cloneOldRepo()
-        create_repo()
-        openPermissionsInBrowser(new_workspace, repo_name)
-    elif choose == 'e':
-        openPermissionsInBrowser(new_workspace, repo_name)
-    else:
-        print("Invalid choice. Exiting.")
-        exit()
+    cloneOldRepo()
+    create_repo()
+    openPermissionsInBrowser(new_workspace, repo_name)
