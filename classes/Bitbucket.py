@@ -3,10 +3,9 @@ import json
 import os
 from rich import print
 from requests.auth import HTTPBasicAuth
-from newRepoData import newRepoData
-from oldRepoData import oldRepoData
+from classes.MyConfig import MyConfig
 
-class Bitbucket:
+class Bitbucket(MyConfig):
     def __init__(self):
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)  # Go one level up to the root directory
@@ -51,22 +50,6 @@ class Bitbucket:
         if not os.path.exists(f"{self.ROOT_DIR}/newRepoData.py") or not os.path.exists(f"{self.ROOT_DIR}/oldRepoData.py"):
             print("Please ensure that newRepoData.py and oldRepoData.py are present in the same directory as this script.")
             exit()
-
-    def initNewData(self):
-        new_data = newRepoData()
-        self.new_workspace = new_data["new_workspace"]
-        self.new_project_key = new_data["new_project_key"]
-        self.new_username = new_data["new_username"]
-        self.new_app_password = new_data["new_app_password"]
-        self.new_is_private = new_data["new_is_private"]
-
-    def initOldData(self):
-        old_data = oldRepoData()
-        self.old_workspace = old_data["old_workspace"]
-        self.old_project_key = old_data["old_project_key"]
-        self.old_username = old_data["old_username"]
-        self.old_app_password = old_data["old_app_password"]
-        self.old_is_private = old_data["old_is_private"]
 
     def setRepoName(self):
         self.repo_name = input("Enter the repository slug: ")

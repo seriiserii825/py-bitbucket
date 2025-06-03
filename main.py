@@ -1,4 +1,5 @@
 from classes.Bitbucket import Bitbucket
+from classes.MySelenium import MySelenium
 
 
 def menu():
@@ -9,8 +10,10 @@ def menu():
 
 if __name__ == "__main__":
     bb = Bitbucket()
-    bb.setRepoName()
-    bb.checkRepoOnOldAccount()
-    bb.checkRepoOnNewAccount()
-    bb.createRepo()
+    # bb.setRepoName()
+    # bb.checkRepoOnOldAccount()
+    # bb.checkRepoOnNewAccount()
+    # bb.createRepo()
+    ms = MySelenium()
+    ms.accessGroup()
     menu()
