@@ -14,15 +14,33 @@ class Bitbucket:
         self.initNewData()
         self.initOldData()
         self.repo_name = ""
+        self.is_in_old_account = False
+        self.is_in_new_account = False
 
     def checkRepoOnOldAccount(self):
         url = f"https://api.bitbucket.org/2.0/repositories/{self.old_workspace}/{self.repo_name}"
         response = requests.get(url, auth=HTTPBasicAuth(self.old_username, self.old_app_password))
         if response.status_code == 200:
             print(f"[green]✅ Repository '{self.repo_name}' exists on the old account.")
+            self.is_in_old_account = True
             return True
         elif response.status_code == 404:
             print(f"[red]❌ Repository '{self.repo_name}' does not exist on the old account.")
+            return False
+        else:
+            print(f"[red]❌ Failed to check repository. Status code: {response.status_code}")
+            print(response.json())
+            return False
+
+    def checkRepoOnNewAccount(self):
+        url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}/{self.repo_name}"
+        response = requests.get(url, auth=HTTPBasicAuth(self.new_username, self.new_app_password))
+        if response.status_code == 200:
+            print(f"[green]✅ Repository '{self.repo_name}' exists on the new account.")
+            self.is_in_new_account = True
+            return True
+        elif response.status_code == 404:
+            print(f"[red]❌ Repository '{self.repo_name}' does not exist on the new account.")
             return False
         else:
             print(f"[red]❌ Failed to check repository. Status code: {response.status_code}")
@@ -50,11 +68,13 @@ class Bitbucket:
         self.old_app_password = old_data["old_app_password"]
         self.old_is_private = old_data["old_is_private"]
 
-
     def setRepoName(self):
         self.repo_name = input("Enter the repository slug: ")
 
     def createRepo(self):
+        if not self.is_in_old_account:
+            print("[red]❌ Repository does not exist on the old account. Cannot create new repository.")
+            return
         url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}/{self.repo_name}"
         payload = {
             "scm": "git",
@@ -65,11 +85,27 @@ class Bitbucket:
         response = requests.post(url, json=payload, auth=HTTPBasicAuth(self.new_username, self.new_app_password))
         if response.status_code in (200, 201):
             print(f"✅ Repository '{self.repo_name}' created successfully!")
+            self.is_in_new_account = True
+            self.cloneOldRepo()
+            self.openPermissionsInBrowser()
+            self.pushNewRepo()
+            self.deleteRepo()
         else:
             print(f"❌ Failed to create repository. Status code: {response.status_code}")
             print(response.json())
 
+    def openPermissionsInBrowser(self):
+        if not self.is_in_new_account:
+            print("[red]❌ Repository does not exist on the new account. Cannot open permissions in browser.")
+            return
+        url = f"https://bitbucket.org/{self.new_workspace}/{self.repo_name}/admin/access"
+        print(f"Opening permissions page for {self.repo_name} in browser...")
+        os.system(f"xdg-open {url}")
+
     def cloneOldRepo(self):
+        if not self.is_in_old_account:
+            print("[red]❌ Repository does not exist on the old account. Cannot clone repository.")
+            return
         repo_url = f"git clone --mirror git@bitbucket.org:sites-bludelego/{self.repo_name}.git";
         # go to downloads
         os.chdir(os.path.expanduser("~/Downloads"))
@@ -77,6 +113,10 @@ class Bitbucket:
         os.system(repo_url)
 
     def pushNewRepo(self):
+        if not self.is_in_old_account:
+            print("[red]❌ Repository does not exist on the old account. Cannot push to new repository.")
+            return
+
         old_repo_path = os.path.join(os.path.expanduser("~/Downloads"), self.repo_name + ".git")
         os.chdir(old_repo_path)
         push_command = f"git push --mirror git@bitbucket.org:blueline2025/{self.repo_name}.git"
@@ -88,6 +128,9 @@ class Bitbucket:
         os.system(push_command)
 
     def deleteRepo(self):
+        if not self.is_in_new_account:
+            print("[red]❌ Repository does not exist on the new account. Cannot delete repository.")
+            return
         url = f"https://api.bitbucket.org/2.0/repositories/{self.old_workspace}/{self.repo_name}"
         try:
             response = requests.delete(url, auth=HTTPBasicAuth(self.old_username, self.old_app_password))
@@ -95,7 +138,6 @@ class Bitbucket:
                 print(f"✅ Repository '{self.repo_name}' deleted successfully!")
         except requests.exceptions.RequestException as e:
             print(f"[red]❌ An error occurred while trying to delete the repository: {e}")
-
 
     def list_workspaces(self, old=False):
         if old:

@@ -11,4 +11,6 @@ if __name__ == "__main__":
     bb = Bitbucket()
     bb.setRepoName()
     bb.checkRepoOnOldAccount()
+    bb.checkRepoOnNewAccount()
+    bb.createNewRepo()
     menu()
