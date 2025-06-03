@@ -12,5 +12,5 @@ if __name__ == "__main__":
     bb.setRepoName()
     bb.checkRepoOnOldAccount()
     bb.checkRepoOnNewAccount()
-    bb.createNewRepo()
+    bb.createRepo()
     menu()
