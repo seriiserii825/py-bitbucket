@@ -113,6 +113,16 @@ class Bitbucket(MyConfig):
         # clone the old repo
         os.system(repo_url)
 
+    def cloneNewRepo(self):
+        if not self.is_in_new_account:
+            print("[red]❌ Repository does not exist on the new account. Cannot clone repository.")
+            return
+        repo_url = f"git clone git@bitbucket.org:blueline2025/{self.repo_name}.git"
+        # go to downloads
+        os.chdir(os.path.expanduser("~/Downloads"))
+        # clone the new repo
+        os.system(repo_url)
+
     def pushNewRepo(self):
         if not self.is_in_old_account:
             print("[red]❌ Repository does not exist on the old account. Cannot push to new repository.")

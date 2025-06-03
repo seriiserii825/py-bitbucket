@@ -1,11 +1,12 @@
 from classes.Bitbucket import Bitbucket
 from classes.MySelenium import MySelenium
-
+from rich import print
 
 def menu():
-    print("1. Clone old repository")
-    print("2. Create new repository")
-    print("3. Exit")
+    print("[green]1. Clone old repository")
+    print("[blue]2. Create new repository")
+    print("[blue]3. Clone new repository")
+    print("[red]4. Exit")
 
 
     choice = input("Enter your choice: ")
@@ -16,16 +17,24 @@ def menu():
         bb.checkRepoOnOldAccount()
         bb.checkRepoOnNewAccount()
         bb.copyOldRepoToNew()
+        want_to_clone = input("Do you want to clone the new repository? (y/n): ").strip().lower()
+        if want_to_clone == 'y':
+            bb.cloneNewRepo()
+        else:
+            print("[yellow]Skipping clone operation.")
     elif choice == "2":
         bb.setRepoName()
         bb.checkRepoOnNewAccount()
         bb.createRepo()
-
     elif choice == "3":
-        print("Exiting...")
+        bb.setRepoName()
+        bb.checkRepoOnNewAccount()
+        bb.cloneNewRepo()
+    elif choice == "4":
+        print("[red]Exiting...")
         exit()
     else:
-        print("Invalid choice. Please try again.")
+        print("[red]Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     menu()
