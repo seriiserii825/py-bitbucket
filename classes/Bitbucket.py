@@ -55,9 +55,6 @@ class Bitbucket(MyConfig):
         self.repo_name = input("Enter the repository slug: ")
 
     def createRepo(self):
-        if not self.is_in_old_account:
-            print("[red]❌ Repository does not exist on the old account. Cannot create new repository.")
-            return
         url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}/{self.repo_name}"
         payload = {
             "scm": "git",
@@ -65,8 +62,29 @@ class Bitbucket(MyConfig):
             "project": {"key": self.new_project_key},
             "name": self.repo_name
         }
-        response = requests.post(url, json=payload, auth=HTTPBasicAuth(self.new_username, self.new_app_password))
-        if response.status_code in (200, 201):
+        return requests.post(url, json=payload, auth=HTTPBasicAuth(self.new_username, self.new_app_password))
+
+    def newRepo(self):
+        if self.is_in_new_account:
+            print("[green]✅ Repository already exists on the new account. No need to create a new one.")
+            return
+
+        new_repo = self.createRepo()
+        if new_repo.status_code in (200, 201):
+            print(f"[green]✅ Repository '{self.repo_name}' created successfully!")
+            self.is_in_new_account = True
+            self.openPermissionsInBrowser()
+        else:
+            print(f"[red]❌ Failed to create repository. Status code: {new_repo.status_code}")
+            print(new_repo.json())
+
+    def copyOldRepoToNew(self):
+        if not self.is_in_old_account:
+            print("[red]❌ Repository does not exist on the old account. Cannot create new repository.")
+            return
+
+        new_repo = self.createRepo()
+        if new_repo.status_code in (200, 201):
             print(f"✅ Repository '{self.repo_name}' created successfully!")
             self.is_in_new_account = True
             self.cloneOldRepo()
