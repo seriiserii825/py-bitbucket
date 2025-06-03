@@ -10,4 +10,5 @@ def menu():
 if __name__ == "__main__":
     bb = Bitbucket()
     bb.setRepoName()
+    bb.checkRepoOnOldAccount()
     menu()

@@ -7,14 +7,27 @@ from newRepoData import newRepoData
 from oldRepoData import oldRepoData
 
 class Bitbucket:
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
+    def __init__(self):
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)  # Go one level up to the root directory
         self.checkConfig()
         self.initNewData()
         self.initOldData()
         self.repo_name = ""
+
+    def checkRepoOnOldAccount(self):
+        url = f"https://api.bitbucket.org/2.0/repositories/{self.old_workspace}/{self.repo_name}"
+        response = requests.get(url, auth=HTTPBasicAuth(self.old_username, self.old_app_password))
+        if response.status_code == 200:
+            print(f"[green]✅ Repository '{self.repo_name}' exists on the old account.")
+            return True
+        elif response.status_code == 404:
+            print(f"[red]❌ Repository '{self.repo_name}' does not exist on the old account.")
+            return False
+        else:
+            print(f"[red]❌ Failed to check repository. Status code: {response.status_code}")
+            print(response.json())
+            return False
 
     def checkConfig(self):
         if not os.path.exists(f"{self.ROOT_DIR}/newRepoData.py") or not os.path.exists(f"{self.ROOT_DIR}/oldRepoData.py"):
