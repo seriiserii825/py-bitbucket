@@ -83,8 +83,8 @@ class Bitbucket(MyConfig):
             print("[red]❌ Repository does not exist on the old account. Cannot create new repository.")
             return
 
-        new_repo = self.createRepo()
-        if new_repo.status_code in (200, 201):
+        response = self.createRepo()
+        if response.status_code in (200, 201):
             print(f"✅ Repository '{self.repo_name}' created successfully!")
             self.is_in_new_account = True
             self.cloneOldRepo()
@@ -101,7 +101,7 @@ class Bitbucket(MyConfig):
             return
         url = f"https://bitbucket.org/{self.new_workspace}/{self.repo_name}/admin/access"
         print(f"Opening permissions page for {self.repo_name} in browser...")
-        os.system(f"xdg-open {url}")
+        os.system(f"firefox {url}")
 
     def cloneOldRepo(self):
         if not self.is_in_old_account:
