@@ -37,10 +37,6 @@ def menu():
     else:
         print("[red]Invalid choice. Please try again.")
         menu()
-    # else:
-    #     # bb.setRepoName()
-    #     bb.changePerimissionsInBrowser()
-    #     # print("[red]Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     menu()
