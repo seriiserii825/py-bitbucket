@@ -4,7 +4,6 @@ import os
 from rich import print
 from requests.auth import HTTPBasicAuth
 from classes.MyConfig import MyConfig
-from classes.MySelenium import MySelenium
 
 class Bitbucket(MyConfig):
     def __init__(self):
@@ -13,7 +12,7 @@ class Bitbucket(MyConfig):
         self.checkConfig()
         self.initNewData()
         self.initOldData()
-        self.repo_name = "bs-servizi-express-casa-24h"
+        self.repo_name = ""
         self.is_in_old_account = False
         self.is_in_new_account = False
 
@@ -79,6 +78,21 @@ class Bitbucket(MyConfig):
             print(f"[red]❌ Failed to create repository. Status code: {new_repo.status_code}")
             print(new_repo.json())
 
+    def checkForNewRepo(self):
+        repo_url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}/{self.repo_name}"
+        response = requests.get(repo_url, auth=HTTPBasicAuth(self.new_username, self.new_app_password))
+        if response.status_code == 200:
+            print(f"[green]✅ Repository '{self.repo_name}' exists on the new account.")
+            self.is_in_new_account = True
+            return True
+        elif response.status_code == 404:
+            print(f"[red]❌ Repository '{self.repo_name}' does not exist on the new account.")
+            return False
+        else:
+            print(f"[red]❌ Failed to check repository. Status code: {response.status_code}")
+            print(response.json())
+            return False
+
     def copyOldRepoToNew(self):
         if not self.is_in_old_account:
             print("[red]❌ Repository does not exist on the old account. Cannot create new repository.")
@@ -97,20 +111,12 @@ class Bitbucket(MyConfig):
             print(response.json())
 
     def openPermissionsInBrowser(self):
-        self.checkRepoOnNewAccount()
         if not self.is_in_new_account:
             print("[red]❌ Repository does not exist on the new account. Cannot open permissions in browser.")
             return
         url = f"https://bitbucket.org/{self.new_workspace}/{self.repo_name}/admin/access"
         print(f"Opening permissions page for {self.repo_name} in browser...")
-        os.system(f"firefox {url}")
-
-    def changePerimissionsInBrowser(self):
-        self.login()
-
-    def login(self):
-        ms = MySelenium()
-        ms.loginToBitbucket(self.repo_name)
+        os.system(f"google-chrome-stable {url}")
 
     def cloneOldRepo(self):
         if not self.is_in_old_account:

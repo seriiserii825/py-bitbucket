@@ -6,8 +6,8 @@ def menu():
     print("[green]1. Clone old repository")
     print("[blue]2. Create new repository")
     print("[blue]3. Clone new repository")
-    print("[red]4. Exit")
-    print("[red]5. Open in browser")
+    print("[green]4. Open permissions")
+    print("[red]5. Exit")
 
 
     choice = input("Enter your choice: ")
@@ -32,11 +32,15 @@ def menu():
         bb.checkRepoOnNewAccount()
         bb.cloneNewRepo()
     elif choice == "4":
+        bb.setRepoName()
+        bb.checkForNewRepo()
+        bb.openPermissionsInBrowser()
+        exit()
+    elif choice == "5":
         print("[red]Exiting...")
         exit()
     else:
         print("[red]Invalid choice. Please try again.")
-        menu()
 
 if __name__ == "__main__":
     menu()
