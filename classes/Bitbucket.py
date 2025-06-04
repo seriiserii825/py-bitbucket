@@ -4,6 +4,7 @@ import os
 from rich import print
 from requests.auth import HTTPBasicAuth
 from classes.MyConfig import MyConfig
+from classes.MySelenium import MySelenium
 
 class Bitbucket(MyConfig):
     def __init__(self):
@@ -12,7 +13,7 @@ class Bitbucket(MyConfig):
         self.checkConfig()
         self.initNewData()
         self.initOldData()
-        self.repo_name = ""
+        self.repo_name = "bs-servizi-express-casa-24h"
         self.is_in_old_account = False
         self.is_in_new_account = False
 
@@ -96,12 +97,20 @@ class Bitbucket(MyConfig):
             print(response.json())
 
     def openPermissionsInBrowser(self):
+        self.checkRepoOnNewAccount()
         if not self.is_in_new_account:
             print("[red]❌ Repository does not exist on the new account. Cannot open permissions in browser.")
             return
         url = f"https://bitbucket.org/{self.new_workspace}/{self.repo_name}/admin/access"
         print(f"Opening permissions page for {self.repo_name} in browser...")
         os.system(f"firefox {url}")
+
+    def changePerimissionsInBrowser(self):
+        self.login()
+
+    def login(self):
+        ms = MySelenium()
+        ms.loginToBitbucket(self.repo_name)
 
     def cloneOldRepo(self):
         if not self.is_in_old_account:

@@ -18,7 +18,7 @@ class MySelenium(MyConfig):
         self.options.add_argument("user-data-dir=/home/serii/.config/google-chrome/My-profile") #Path to your chrome profile
         self.driver = webdriver.Chrome(service=self.service, options=self.options)
         self.account_url = "https://reggiocalor.altuofianco.com"
-        self.sitem_login = "https://reggiocalor.altuofianco.com/gestione"
+        self.sitem_login = "https://id.atlassian.com/login"
         current_dir_path = os.getcwd()
         # self.theme_name = os.path.basename(current_dir_path)
         # self.pr = Project(self.theme_name)
@@ -37,6 +37,23 @@ class MySelenium(MyConfig):
             if (items.every(e => e.state === "COMPLETE"))
                 return items.map(e => e.fileUrl || e.file_url);
         """)
+
+
+    def loginToBitbucket(self, repo_name):
+        repo_name = repo_name.strip()
+        self.driver.get(self.sitem_login)
+        self.driver.implicitly_wait(10)
+        login_input = self.driver.find_element(By.CSS_SELECTOR, "#form-login [name='username']")
+        login_input.send_keys(self.bitbucket_login)
+        button_submit = self.driver.find_element(By.CSS_SELECTOR, "#login-submit")
+        button_submit.click()
+
+        submit_input = self.driver.find_element(By.CSS_SELECTOR, "input#password")
+        self.driver.implicitly_wait(10)
+        submit_input.send_keys(self.bitbucket_password)
+        button_submit.click()
+
+        time.sleep(10000)
 
     def loginToSite(self):
         while True:

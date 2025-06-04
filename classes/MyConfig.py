@@ -26,6 +26,8 @@ class MyConfig:
         self.new_username = new_data["new_username"]
         self.new_app_password = new_data["new_app_password"]
         self.new_is_private = new_data["new_is_private"]
+        self.bitbucket_login = new_data["bitbucket_login"]
+        self.bitbucket_password = new_data["bitbucket_password"]
 
     def initOldData(self):
         old_data = oldRepoData()
