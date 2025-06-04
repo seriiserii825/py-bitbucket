@@ -9,7 +9,6 @@ class Bitbucket(MyConfig):
     def __init__(self):
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)  # Go one level up to the root directory
-        self.setRepoName()
         self.checkConfig()
         self.initNewData()
         self.initOldData()
@@ -33,6 +32,7 @@ class Bitbucket(MyConfig):
             return False
 
     def checkRepoOnNewAccount(self):
+        print(f'self.repo_name: {self.repo_name}')
         url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}/{self.repo_name}"
         response = requests.get(url, auth=HTTPBasicAuth(self.new_username, self.new_app_password))
         if response.status_code == 200:
@@ -130,9 +130,6 @@ class Bitbucket(MyConfig):
         os.system(repo_url)
 
     def cloneNewRepo(self):
-        if not self.is_in_new_account:
-            print("[red]❌ Repository does not exist on the new account. Cannot clone repository.")
-            return
         repo_url = f"git clone git@bitbucket.org:blueline2025/{self.repo_name}.git"
         # go to downloads
         os.chdir(os.path.expanduser("~/Downloads"))
