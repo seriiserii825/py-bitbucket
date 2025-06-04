@@ -4,10 +4,12 @@ from rich import print
 
 def menu():
     print("[green]1. Clone old repository")
+    print("[green]1.1 Check repository")
     print("[blue]2. Create new repository")
     print("[blue]3. Clone new repository")
     print("[green]4. Open permissions")
-    print("[red]5. Exit")
+    print("[red]5. Delete old repo")
+    print("[red]6. Exit")
 
 
     choice = input("Enter your choice: ")
@@ -23,6 +25,10 @@ def menu():
             bb.cloneNewRepo()
         else:
             print("[yellow]Skipping clone operation.")
+    elif choice == "1.1":
+        bb.setRepoName()
+        bb.checkRepoOnOldAccount()
+        bb.checkRepoOnNewAccount()
     elif choice == "2":
         bb.setRepoName()
         bb.checkRepoOnNewAccount()
@@ -37,6 +43,10 @@ def menu():
         bb.openPermissionsInBrowser()
         exit()
     elif choice == "5":
+        bb.setRepoName()
+        bb.checkRepoOnOldAccount()
+        bb.deleteRepo()
+    elif choice == "6":
         print("[red]Exiting...")
         exit()
         bb.setRepoName()

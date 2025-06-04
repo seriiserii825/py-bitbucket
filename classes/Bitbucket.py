@@ -152,9 +152,6 @@ class Bitbucket(MyConfig):
         os.system(push_command)
 
     def deleteRepo(self):
-        if not self.is_in_new_account:
-            print("[red]❌ Repository does not exist on the new account. Cannot delete repository.")
-            return
         url = f"https://api.bitbucket.org/2.0/repositories/{self.old_workspace}/{self.repo_name}"
         try:
             response = requests.delete(url, auth=HTTPBasicAuth(self.old_username, self.old_app_password))
