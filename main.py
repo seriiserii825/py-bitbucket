@@ -14,7 +14,6 @@ def menu():
     bb = Bitbucket()
 
     if choice == "1":
-        bb.setRepoName()
         bb.checkRepoOnOldAccount()
         bb.checkRepoOnNewAccount()
         bb.copyOldRepoToNew()
@@ -24,15 +23,12 @@ def menu():
         else:
             print("[yellow]Skipping clone operation.")
     elif choice == "2":
-        bb.setRepoName()
         bb.checkRepoOnNewAccount()
         bb.newRepo()
     elif choice == "3":
-        bb.setRepoName()
         bb.checkRepoOnNewAccount()
         bb.cloneNewRepo()
     elif choice == "4":
-        bb.setRepoName()
         bb.checkForNewRepo()
         bb.openPermissionsInBrowser()
         exit()

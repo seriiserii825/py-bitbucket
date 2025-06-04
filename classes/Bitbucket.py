@@ -9,6 +9,7 @@ class Bitbucket(MyConfig):
     def __init__(self):
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)  # Go one level up to the root directory
+        self.setRepoName()
         self.checkConfig()
         self.initNewData()
         self.initOldData()
