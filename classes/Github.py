@@ -51,8 +51,8 @@ class Github:
         if not self.checkRepo():
             print("[red]❌ Cannot clone repository that does not exist.")
             return
-        
-        clone_url = f"{self.repo_http}/{self.repo_name}.git"
+        clone_url = f"git@github.com:seriiserii825/{self.repo_name}.git"
+
         try:
             subprocess.run(["git", "clone", clone_url], check=True)
             print(f"[green]✅ Repository '{self.repo_name}' cloned successfully!")
