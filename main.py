@@ -4,7 +4,7 @@ from classes.MySelenium import MySelenium
 from rich import print
 
 def menu():
-    print("[green]1. Clone old repository")
+    print("[green]1. Copy old repo to bitbucket2025")
     print("[green]1.1 Check repository")
     print("[blue]2. Create new repository")
     print("[blue]3. Clone new repository")
