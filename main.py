@@ -1,4 +1,5 @@
 from classes.Bitbucket import Bitbucket
+from classes.Github import Github
 from classes.MySelenium import MySelenium
 from rich import print
 
@@ -7,9 +8,10 @@ def menu():
     print("[green]1.1 Check repository")
     print("[blue]2. Create new repository")
     print("[blue]3. Clone new repository")
-    print("[green]4. Open permissions")
+    print("[blue]4. Open permissions")
     print("[red]5. Delete old repo")
-    print("[red]6. Exit")
+    print("[yellow]6. Search github")
+    print("[yellow]7. Clone from github")
 
 
     choice = input("Enter your choice: ")
@@ -47,10 +49,14 @@ def menu():
         bb.checkRepoOnOldAccount()
         bb.deleteRepo()
     elif choice == "6":
-        print("[red]Exiting...")
-        exit()
-        bb.setRepoName()
-        bb.setRepoName()
+        gh = Github()
+        gh.findRepo()
+        menu()
+    elif choice == "7":
+        gh = Github()
+        gh.setRepoName()
+        gh.checkRepo()
+        gh.cloneRepo()
     else:
         print("[red]Invalid choice. Please try again.")
 
