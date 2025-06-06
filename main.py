@@ -16,14 +16,18 @@ def menu():
     print("[blue]9. List repos")
 
 
-    choice = input("Enter your choice: ")
-    bb = Bitbucket()
-    bb.initData("bludelego@gmail.com")
+    # choice = input("Enter your choice: ")
+    # bb.initData("bludelego@gmail.com")
 
     old_workspace = 'sites-bludelego'
     new_workspace = 'blueline2025'
 
+    old_email = "bludelego@gmail.com"
+    new_email = "radu@blueline.md"
+
     bb = Bitbucket()
+    bb.initData(old_email)
+    bb.chooseWorkspaces()
 
     # if choice == "1":
     #     bb.setRepoName()

@@ -4,6 +4,9 @@ import os
 from rich import console, print
 from requests.auth import HTTPBasicAuth
 from modules.getRepoData import getRepoData
+from pyfzf.pyfzf import FzfPrompt
+
+fzf = FzfPrompt()
 
 class Bitbucket():
     def __init__(self):
@@ -18,14 +21,16 @@ class Bitbucket():
         self.is_private = True
         self.account = 1
         self.initData("bludelego@gmail.com")
-        if self.account == 1:
-            self.auth = HTTPBasicAuth(self.username, self.app_password)
-        else:
-            self.auth = HTTPBasicAuth(self.username, self.app_password)
+        self.auth = HTTPBasicAuth(self.username, self.app_password)
 
     def initData(self, email):
         data = getRepoData(email, self.ROOT_DIR)
-        print(f"data: {data}")
+        self.workspace = data["workspace"]
+        self.project_key = data["project_key"]
+        self.username = data["username"]
+        self.app_password = data["app_password"]
+        self.is_private = data["is_private"]
+
         if not data:
             print(f"no data found for email {email}")
             exit()
@@ -197,63 +202,61 @@ class Bitbucket():
     #         print(f"[red]❌ An error occurred while trying to list repositories: {e}")
     #         return []
     #
-    # def fetchWorkspaceRepos(self, workspaces: list, account: int = 1):
-    #     self.account = account
-    #     self.workspaces = workspaces  # make this a list in case of future expansion
-    #     print("📦 Starting to fetch all repository data...")
-    #     
-    #     for workspace in self.workspaces:
-    #         count = 1
-    #         while True:
-    #             url = (
-    #                 f"https://api.bitbucket.org/2.0/repositories/{workspace}"
-    #                 f"?pagelen=100&page={count}&fields=next,values.links.branches.href,values.full_name"
-    #             )
-    #             response = requests.get(url, auth=self.new_auth)
-    #             if response.status_code != 200:
-    #                 print(f"[red]❌ Failed to fetch data: {response.status_code} {response.text}")
-    #                 break
-    #
-    #             data = response.json()
-    #             values = data.get("values", [])
-    #
-    #             print(f"🔍 Page {count} - Fetched {len(values)} repositories")
-    #
-    #             if not values:
-    #                 print("✅ No more repositories found.")
-    #                 break  # Do not return, just break the pagination loop
-    #
-    #             # Save raw response to file (optional)
-    #             with open(f"data_page_{count}.json", "w") as f:
-    #                 f.write(response.text)
-    #
-    #             # Print names for clarity
-    #             for repo in values:
-    #                 print(f"📁 {repo['full_name']}")
-    #
-    #             count += 1
-    #
-    #     print("🎉 All repositories fetched.")
-    #     os.system('rm data_page*.json')
-    #
-    # def list_workspaces(self, old=False):
-    #     if old:
-    #         print("Listing old workspaces...")  # green text
-    #         username = self.old_username
-    #         app_password = self.old_app_password
-    #     else:
-    #         username = self.new_username
-    #         app_password = self.new_app_password
-    #     print("\033[92mListing workspaces...\033[0m")  # green text
-    #     url = "https://api.bitbucket.org/2.0/workspaces"
-    #     response = requests.get(url, auth=HTTPBasicAuth(username, app_password))
-    #     print(f"HTTP STATUS: {response.status_code}")
-    #     if response.ok:
-    #         data = response.json()
-    #         print(json.dumps(data, indent=2))
-    #     else:
-    #         print("Failed to list workspaces.")
-    #         print(response.text)
+    def fetchWorkspaceRepos(self, workspaces: list, account: int = 1):
+        self.account = account
+        self.workspaces = workspaces  # make this a list in case of future expansion
+        print("📦 Starting to fetch all repository data...")
+
+        for workspace in self.workspaces:
+            count = 1
+            while True:
+                url = (
+                    f"https://api.bitbucket.org/2.0/repositories/{workspace}"
+                    f"?pagelen=100&page={count}&fields=next,values.links.branches.href,values.full_name"
+                )
+                response = requests.get(url, auth=self.auth)
+                if response.status_code != 200:
+                    print(f"[red]❌ Failed to fetch data: {response.status_code} {response.text}")
+                    break
+
+                data = response.json()
+                values = data.get("values", [])
+
+                print(f"🔍 Page {count} - Fetched {len(values)} repositories")
+
+                if not values:
+                    print("✅ No more repositories found.")
+                    break  # Do not return, just break the pagination loop
+
+                # Save raw response to file (optional)
+                with open(f"data_page_{count}.json", "w") as f:
+                    f.write(response.text)
+
+                # Print names for clarity
+                for repo in values:
+                    print(f"📁 {repo['full_name']}")
+
+                count += 1
+
+        print("🎉 All repositories fetched.")
+        os.system('rm data_page*.json')
+
+    def chooseWorkspaces(self):
+        url = "https://api.bitbucket.org/2.0/workspaces"
+        response = requests.get(url, auth=self.auth)
+        workspaces = []
+        if response.ok:
+            data = response.json()
+            for item in data.get("values", []):
+                workspace = item['slug'] 
+                workspaces.append(workspace)
+            workspace = fzf.prompt(workspaces)
+            self.workspace = workspace[0]
+            print(f"Choosed workspace {self.workspace}")
+        else:
+            print("Failed to list workspaces.")
+            print(response.text)
+            exit()
     #
     # def list_projects(self, workspace, old=False):
     #     if old:
