@@ -213,49 +213,76 @@ class Bitbucket():
     #         print(f"[red]❌ An error occurred while trying to list repositories: {e}")
     #         return []
     #
-    def fetchWorkspaceRepos(self, workspaces: list, account: int = 1):
-        self.account = account
-        self.workspaces = workspaces  # make this a list in case of future expansion
-        print("📦 Starting to fetch all repository data...")
+    def fetchWorkspaceRepos(self):
+        repos = []
+        url = (
+            f"https://api.bitbucket.org/2.0/repositories/{self.workspace}"
+            f"?pagelen=100&fields=next,values.links.branches.href,values.full_name"
+        )
 
-        for workspace in self.workspaces:
-            count = 1
-            while True:
-                url = (
-                    f"https://api.bitbucket.org/2.0/repositories/{workspace}"
-                    f"?pagelen=100&page={count}&fields=next,values.links.branches.href,values.full_name"
-                )
-                response = requests.get(url, auth=self.auth)
-                if response.status_code != 200:
-                    print(f"[red]❌ Failed to fetch data: {response.status_code} {response.text}")
-                    break
+        count = 1
+        while url:
+            print(f"Fetching page {count}: {url}")
+            response = requests.get(url, auth=self.auth)
 
-                data = response.json()
-                values = data.get("values", [])
+            if response.status_code != 200:
+                self.prettyPrint(f"Failed to fetch data: {response.status_code} {response.text}", error=True)
+                break
 
-                print(f"🔍 Page {count} - Fetched {len(values)} repositories")
+            data = response.json()
+            values = data.get("values", [])
 
-                if not values:
-                    print("✅ No more repositories found.")
-                    break  # Do not return, just break the pagination loop
+            if not values:
+                self.prettyPrint("No more repositories to fetch.", error=True)
+                break
 
-                # Save raw response to file (optional)
-                with open(f"data_page_{count}.json", "w") as f:
-                    f.write(response.text)
+            self.prettyPrint(f"Page {count} - Fetched {len(values)} repositories")
 
-                # Print names for clarity
-                for repo in values:
-                    print(f"📁 {repo['full_name']}")
+            # Optionally save the raw data
+            with open(f"data_page_{count}.json", "w") as f:
+                f.write(response.text)
 
-                count += 1
+            for repo in values:
+                repos.append(repo["full_name"])
 
-        print("🎉 All repositories fetched.")
-        os.system('rm data_page*.json')
+            url = data.get("next")  # Get the next page URL
+            count += 1
+
+        # Optionally clean up
+        os.system("rm data_page_*.json")
+
+        self.repos = sorted(repos, key=lambda x: x.lower())
+
+    def showRepos(self):
+        self.fetchWorkspaceRepos()
+        if not self.repos:
+            self.prettyPrint("No repositories found in the workspace.", error=True)
+            return
+        self.prettyPrint(f"Found {len(self.repos)} repositories in workspace '{self.workspace}':")
+        for repo in self.repos:
+            print(repo)
+
+    def searchRepo(self):
+        search_term = input("Enter the search term for repositories: ").strip()
+        self.fetchWorkspaceRepos()
+        # check if search_term exists in self.repos as a substring
+        matching_repos = [repo for repo in self.repos if search_term.lower() in repo.lower()]
+        if not matching_repos:
+            self.prettyPrint(f"No repositories found matching '{search_term}'", error=True)
+        else:
+            self.prettyPrint(f"Found {len(matching_repos)} repositories matching '{search_term}':")
+            for repo in matching_repos:
+                print(repo)
 
     def chooseWorkspaces(self):
         url = "https://api.bitbucket.org/2.0/workspaces"
         response = requests.get(url, auth=self.auth)
         workspaces = []
+        agree = input("Do you want to choose a workspace? (y/n): ").strip().lower()
+        if agree != 'y':
+            self.workspace = "blueline2025"
+            self.prettyPrint(f"Using default workspace: {self.workspace}")
+            return
         if response.ok:
             data = response.json()
             for item in data.get("values", []):

@@ -28,6 +28,8 @@ def menu():
     bb = Bitbucket()
     bb.initData(old_email)
     bb.chooseWorkspaces()
+    # bb.showRepos()
+    bb.searchRepo()
 
     # if choice == "1":
     #     bb.setRepoName()
