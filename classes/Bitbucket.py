@@ -15,11 +15,16 @@ class Bitbucket(MyConfig):
         self.repo_name = ""
         self.is_in_old_account = False
         self.is_in_new_account = False
-        self.new_auth = HTTPBasicAuth(self.new_username, self.new_app_password)
+        self.account = 1
+        if self.account == 1:
+            self.auth = HTTPBasicAuth(self.new_username, self.new_app_password)
+        else:
+            self.auth = HTTPBasicAuth(self.old_username, self.old_app_password)
 
-    def checkRepoOnOldAccount(self):
-        url = f"https://api.bitbucket.org/2.0/repositories/{self.old_workspace}/{self.repo_name}"
-        response = requests.get(url, auth=HTTPBasicAuth(self.old_username, self.old_app_password))
+    def checkRemoteRepo(self, workspace, account: int = 1):
+        self.account = account
+        url = f"https://api.bitbucket.org/2.0/repositories/{workspace}/{self.repo_name}"
+        response = requests.get(url, auth=self.auth)
         if response.status_code == 200:
             print(f"[green]✅ Repository '{self.repo_name}' exists on the old account.")
             self.is_in_old_account = True
@@ -184,7 +189,8 @@ class Bitbucket(MyConfig):
             print(f"[red]❌ An error occurred while trying to list repositories: {e}")
             return []
 
-    def fetchWorkspaceRepos(self, workspaces: list):
+    def fetchWorkspaceRepos(self, workspaces: list, account: int = 1):
+        self.account = account
         self.workspaces = workspaces  # make this a list in case of future expansion
         print("📦 Starting to fetch all repository data...")
         
@@ -201,7 +207,6 @@ class Bitbucket(MyConfig):
                     break
 
                 data = response.json()
-                print(f"data: {data}")
                 values = data.get("values", [])
 
                 print(f"🔍 Page {count} - Fetched {len(values)} repositories")
@@ -221,6 +226,7 @@ class Bitbucket(MyConfig):
                 count += 1
 
         print("🎉 All repositories fetched.")
+        os.system('rm data_page*.json')
 
     def list_workspaces(self, old=False):
         if old:

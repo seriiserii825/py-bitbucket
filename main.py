@@ -19,10 +19,13 @@ def menu():
     choice = input("Enter your choice: ")
     bb = Bitbucket()
 
+    old_workspace = 'sites-bludelego'
+    new_workspace = 'blueline2025'
+
     if choice == "1":
         bb.setRepoName()
-        bb.checkRepoOnOldAccount()
-        bb.checkRepoOnNewAccount()
+        bb.checkRemoteRepo(old_workspace)
+        bb.checkRemoteRepo(new_workspace, 2)
         bb.copyOldRepoToNew()
         want_to_clone = input("Do you want to clone the new repository? (y/n): ").strip().lower()
         if want_to_clone == 'y':
@@ -65,7 +68,7 @@ def menu():
     elif choice == "9":
         bb = Bitbucket()
         workspaces = ['blueline2025']
-        bb.fetchWorkspaceRepos(workspaces)
+        bb.fetchWorkspaceRepos(workspaces, 2)
     else:
         print("[red]Invalid choice. Please try again.")
 
