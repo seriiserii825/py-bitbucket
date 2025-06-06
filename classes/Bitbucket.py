@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-from rich import print
+from rich import console, print
 from requests.auth import HTTPBasicAuth
 from classes.MyConfig import MyConfig
 
@@ -15,6 +15,7 @@ class Bitbucket(MyConfig):
         self.repo_name = ""
         self.is_in_old_account = False
         self.is_in_new_account = False
+        self.new_auth = HTTPBasicAuth(self.new_username, self.new_app_password)
 
     def checkRepoOnOldAccount(self):
         url = f"https://api.bitbucket.org/2.0/repositories/{self.old_workspace}/{self.repo_name}"
@@ -159,6 +160,67 @@ class Bitbucket(MyConfig):
                 print(f"✅ Repository '{self.repo_name}' deleted successfully!")
         except requests.exceptions.RequestException as e:
             print(f"[red]❌ An error occurred while trying to delete the repository: {e}")
+
+    def listRepos(self):
+        self.new_workspace = "blueline2025"
+        url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}"
+        try:
+            repos = []
+            while url:
+                response = requests.get(url, auth=HTTPBasicAuth(self.new_username, self.new_username))
+                if response.status_code == 200:
+                    data = response.json()
+                    for repo in data.get("values", []):
+                        repos.append(repo["name"])
+                    url = data.get("next")  # Pagination support
+                else:
+                    print(f"[red]❌ Failed to fetch repositories: {response.status_code} {response.text}")
+                    break
+            print(f"✅ Found {len(repos)} repositories:")
+            for repo_name in repos:
+                print(f" - {repo_name}")
+            return repos
+        except requests.exceptions.RequestException as e:
+            print(f"[red]❌ An error occurred while trying to list repositories: {e}")
+            return []
+
+    def fetchWorkspaceRepos(self, workspaces: list):
+        self.workspaces = workspaces  # make this a list in case of future expansion
+        print("📦 Starting to fetch all repository data...")
+        
+        for workspace in self.workspaces:
+            count = 1
+            while True:
+                url = (
+                    f"https://api.bitbucket.org/2.0/repositories/{workspace}"
+                    f"?pagelen=100&page={count}&fields=next,values.links.branches.href,values.full_name"
+                )
+                response = requests.get(url, auth=self.new_auth)
+                if response.status_code != 200:
+                    print(f"[red]❌ Failed to fetch data: {response.status_code} {response.text}")
+                    break
+
+                data = response.json()
+                print(f"data: {data}")
+                values = data.get("values", [])
+
+                print(f"🔍 Page {count} - Fetched {len(values)} repositories")
+
+                if not values:
+                    print("✅ No more repositories found.")
+                    break  # Do not return, just break the pagination loop
+
+                # Save raw response to file (optional)
+                with open(f"data_page_{count}.json", "w") as f:
+                    f.write(response.text)
+
+                # Print names for clarity
+                for repo in values:
+                    print(f"📁 {repo['full_name']}")
+
+                count += 1
+
+        print("🎉 All repositories fetched.")
 
     def list_workspaces(self, old=False):
         if old:

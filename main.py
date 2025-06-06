@@ -12,6 +12,8 @@ def menu():
     print("[red]5. Delete old repo")
     print("[yellow]6. Search github")
     print("[yellow]7. Clone from github")
+    print("[yellow]8. Create repo github")
+    print("[blue]9. List repos")
 
 
     choice = input("Enter your choice: ")
@@ -57,6 +59,13 @@ def menu():
         gh.setRepoName()
         gh.checkRepo()
         gh.cloneRepo()
+    elif choice == "8":
+        gh = Github()
+        gh.createRepo()
+    elif choice == "9":
+        bb = Bitbucket()
+        workspaces = ['blueline2025']
+        bb.fetchWorkspaceRepos(workspaces)
     else:
         print("[red]Invalid choice. Please try again.")
 

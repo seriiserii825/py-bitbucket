@@ -51,3 +51,4 @@ venv/
 
 # Sphinx documentation
 docs/_build/
+githubData.py
