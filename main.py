@@ -4,32 +4,40 @@ from classes.MySelenium import MySelenium
 from rich import print
 
 def menu():
-    print("[green]1. Copy old repo to bitbucket2025")
-    print("[green]1.1 Check repository")
-    print("[blue]2. Create new repository")
-    print("[blue]3. Clone new repository")
-    print("[blue]4. Open permissions")
-    print("[red]5. Delete old repo")
-    print("[yellow]6. Search github")
-    print("[yellow]7. Clone from github")
-    print("[yellow]8. Create repo github")
-    print("[blue]9. List repos")
+    print("[green]1. Show repo with fzf")
+    print("[green]2. Search repo by word")
+    # print("[green]1. Copy old repo to bitbucket2025")
+    # print("[green]1.1 Check repository")
+    # print("[blue]2. Create new repository")
+    # print("[blue]3. Clone new repository")
+    # print("[blue]4. Open permissions")
+    # print("[red]5. Delete old repo")
+    # print("[yellow]6. Search github")
+    # print("[yellow]7. Clone from github")
+    # print("[yellow]8. Create repo github")
+    # print("[blue]9. List repos")
 
 
-    # choice = input("Enter your choice: ")
-    # bb.initData("bludelego@gmail.com")
-
-    old_workspace = 'sites-bludelego'
-    new_workspace = 'blueline2025'
-
+    choice = input("Enter your choice: ")
     old_email = "bludelego@gmail.com"
     new_email = "radu@blueline.md"
 
-    bb = Bitbucket()
-    bb.initData(old_email)
-    bb.chooseWorkspaces()
-    # bb.showRepos()
-    bb.searchRepo()
+    # bb = Bitbucket()
+    # bb.initData(old_email)
+    # bb.chooseWorkspaces()
+    # # bb.showRepos()
+    # bb.searchRepo()
+
+    if choice == "1":
+        bb = Bitbucket()
+        bb.initData()
+        bb.chooseWorkspaces()
+        bb.showRepos()
+    elif choice == "2":
+        bb = Bitbucket()
+        bb.initData()
+        bb.chooseWorkspaces()
+        bb.searchRepo()
 
     # if choice == "1":
     #     bb.setRepoName()

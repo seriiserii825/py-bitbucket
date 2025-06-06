@@ -1,27 +1,29 @@
 import requests
-import json
 import os
-from rich import console, print
+from rich import  print
 from requests.auth import HTTPBasicAuth
 from modules.getRepoData import getRepoData
 from pyfzf.pyfzf import FzfPrompt
-
 fzf = FzfPrompt()
-
 class Bitbucket():
     def __init__(self):
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)  # Go one level up to the root directory
-        # self.checkConfig()
         self.repo_name = ""
         self.workspace = ""
         self.project_key = ""
         self.username = ""
         self.app_password =""
         self.is_private = True
-        self.account = 1
-        self.initData("bludelego@gmail.com")
         self.auth = HTTPBasicAuth(self.username, self.app_password)
+    def printInitData(self):
+        print(f"[blue]ROOT_DIR: {self.ROOT_DIR}")
+        print(f"[blue]repo_name: {self.repo_name}")
+        print(f"[blue]workspace: {self.workspace}")
+        print(f"[blue]project_key: {self.project_key}")
+        print(f"[blue]username: {self.username}")
+        print(f"[blue]app_password: {self.app_password}")
+        print(f"[blue]is_private: {self.is_private}")
 
     def prettyPrint(self,value, error=False):
         if error:
@@ -32,18 +34,110 @@ class Bitbucket():
             print("[blue]===============================")
             print(value)
             print("[blue]===============================")
-
-
-    def initData(self, email):
-        data = getRepoData(email, self.ROOT_DIR)
+    def initData(self):
+        accounts = getRepoData(self.ROOT_DIR)
+        emails = [account["email"] for account in accounts]
+        aggree = input("Do you want to choose an email, by defaul will be bludelego@gmail.com? (y/n): ").strip().lower()
+        if aggree != 'y':
+            email = "bludelego@gmail.com"
+        else:
+            email = fzf.prompt(emails)
+            email = email[0]  # Get the first selected email
+        print(f'email: {email}')
+        data = next((account for account in accounts if account["email"] == email), None)
+        if not data:
+            self.prettyPrint(f"No account found for email {email}", error=True)
+            exit()
+        print(f'data: {data}')
         self.workspace = data["workspace"]
         self.project_key = data["project_key"]
         self.username = data["username"]
         self.app_password = data["app_password"]
         self.is_private = data["is_private"]
-
+        self.auth = HTTPBasicAuth(self.username, self.app_password)
         if not data:
             self.prettyPrint(f"no data found for email {email}")
+            exit()
+    def fetchWorkspaceRepos(self):
+        repos = []
+        url = (
+            f"https://api.bitbucket.org/2.0/repositories/{self.workspace}"
+            f"?pagelen=100&fields=next,values.links.branches.href,values.full_name"
+        )
+        count = 1
+        while url:
+            print(f"Fetching page {count}: {url}")
+            response = requests.get(url, auth=self.auth)
+            if response.status_code != 200:
+                self.prettyPrint(f"Failed to fetch data: {response.status_code} {response.text}", error=True)
+                break
+            data = response.json()
+            values = data.get("values", [])
+            if not values:
+                self.prettyPrint("No more repositories to fetch.", error=True)
+                break
+            self.prettyPrint(f"Page {count} - Fetched {len(values)} repositories")
+            # Optionally save the raw data
+            with open(f"data_page_{count}.json", "w") as f:
+                f.write(response.text)
+            for repo in values:
+                repos.append(repo["full_name"])
+            url = data.get("next")  # Get the next page URL
+            count += 1
+        # Optionally clean up
+        os.system("rm data_page_*.json")
+        self.repos = sorted(repos, key=lambda x: x.lower())
+    def showRepos(self):
+        self.fetchWorkspaceRepos()
+        if not self.repos:
+            self.prettyPrint("No repositories found in the workspace.", error=True)
+            return
+        self.prettyPrint(f"Found {len(self.repos)} repositories in workspace '{self.workspace}':")
+        agree = input("Choose a repo, press 'Enter' to select or 'q' to quit: ").strip().lower()
+        if agree == 'q':
+            self.prettyPrint("Exiting without selecting a repository.", error=True)
+            return
+        data = fzf.prompt(self.repos)
+        if not data:
+            self.prettyPrint("No repository selected.", error=True)
+            return
+        selected_repo = data[0]
+        self.prettyPrint(f"Selected repository: {selected_repo}")
+
+    def searchRepo(self):
+        search_term = input("Enter the search term for repositories: ").strip()
+        self.fetchWorkspaceRepos()
+        # check if search_term exists in self.repos as a substring
+        matching_repos = [repo for repo in self.repos if search_term.lower() in repo.lower()]
+        if not matching_repos:
+            self.prettyPrint(f"No repositories found matching '{search_term}'", error=True)
+        else:
+            self.prettyPrint(f"Found {len(matching_repos)} repositories matching '{search_term}':")
+            for repo in matching_repos:
+                print(repo)
+    def chooseWorkspaces(self):
+        url = "https://api.bitbucket.org/2.0/workspaces"
+        response = requests.get(url, auth=self.auth)
+        workspaces = []
+        agree = input("Do you want to choose a workspace? (y/n): ").strip().lower()
+        print(f"agree: {agree}")
+        if agree != 'y':
+            self.workspace = "blueline2025"
+            self.prettyPrint(f"Using default workspace: {self.workspace}")
+            return
+        print(f'self.printInitData(): {self.printInitData()}')
+        print(f'response: {response}')
+        if response.ok:
+            data = response.json()
+            for item in data.get("values", []):
+                workspace = item['slug'] 
+                workspaces.append(workspace)
+            workspace = fzf.prompt(workspaces)
+            self.workspace = workspace[0]
+            self.prettyPrint(f"Selected workspace: {self.workspace}")
+        else:
+            self.prettyPrint(response.text, error=True)
+            print(response.text)
             exit()
 
     # def checkRemoteRepo(self):
@@ -213,88 +307,6 @@ class Bitbucket():
     #         print(f"[red]❌ An error occurred while trying to list repositories: {e}")
     #         return []
     #
-    def fetchWorkspaceRepos(self):
-        repos = []
-        url = (
-            f"https://api.bitbucket.org/2.0/repositories/{self.workspace}"
-            f"?pagelen=100&fields=next,values.links.branches.href,values.full_name"
-        )
-
-        count = 1
-        while url:
-            print(f"Fetching page {count}: {url}")
-            response = requests.get(url, auth=self.auth)
-
-            if response.status_code != 200:
-                self.prettyPrint(f"Failed to fetch data: {response.status_code} {response.text}", error=True)
-                break
-
-            data = response.json()
-            values = data.get("values", [])
-
-            if not values:
-                self.prettyPrint("No more repositories to fetch.", error=True)
-                break
-
-            self.prettyPrint(f"Page {count} - Fetched {len(values)} repositories")
-
-            # Optionally save the raw data
-            with open(f"data_page_{count}.json", "w") as f:
-                f.write(response.text)
-
-            for repo in values:
-                repos.append(repo["full_name"])
-
-            url = data.get("next")  # Get the next page URL
-            count += 1
-
-        # Optionally clean up
-        os.system("rm data_page_*.json")
-
-        self.repos = sorted(repos, key=lambda x: x.lower())
-
-    def showRepos(self):
-        self.fetchWorkspaceRepos()
-        if not self.repos:
-            self.prettyPrint("No repositories found in the workspace.", error=True)
-            return
-        self.prettyPrint(f"Found {len(self.repos)} repositories in workspace '{self.workspace}':")
-        for repo in self.repos:
-            print(repo)
-
-    def searchRepo(self):
-        search_term = input("Enter the search term for repositories: ").strip()
-        self.fetchWorkspaceRepos()
-        # check if search_term exists in self.repos as a substring
-        matching_repos = [repo for repo in self.repos if search_term.lower() in repo.lower()]
-        if not matching_repos:
-            self.prettyPrint(f"No repositories found matching '{search_term}'", error=True)
-        else:
-            self.prettyPrint(f"Found {len(matching_repos)} repositories matching '{search_term}':")
-            for repo in matching_repos:
-                print(repo)
-
-    def chooseWorkspaces(self):
-        url = "https://api.bitbucket.org/2.0/workspaces"
-        response = requests.get(url, auth=self.auth)
-        workspaces = []
-        agree = input("Do you want to choose a workspace? (y/n): ").strip().lower()
-        if agree != 'y':
-            self.workspace = "blueline2025"
-            self.prettyPrint(f"Using default workspace: {self.workspace}")
-            return
-        if response.ok:
-            data = response.json()
-            for item in data.get("values", []):
-                workspace = item['slug'] 
-                workspaces.append(workspace)
-            workspace = fzf.prompt(workspaces)
-            self.workspace = workspace[0]
-            self.prettyPrint(f"Selected workspace: {self.workspace}")
-        else:
-            self.prettyPrint(response.text, error=True)
-            print(response.text)
-            exit()
     #
     # def list_projects(self, workspace, old=False):
     #     if old:
@@ -314,4 +326,3 @@ class Bitbucket():
     #     else:
     #         print("Failed to list projects.")
     #         print(response.text)
-
