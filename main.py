@@ -18,59 +18,62 @@ def menu():
 
     choice = input("Enter your choice: ")
     bb = Bitbucket()
+    bb.initData("bludelego@gmail.com")
 
     old_workspace = 'sites-bludelego'
     new_workspace = 'blueline2025'
 
-    if choice == "1":
-        bb.setRepoName()
-        bb.checkRemoteRepo(old_workspace)
-        bb.checkRemoteRepo(new_workspace, 2)
-        bb.copyOldRepoToNew()
-        want_to_clone = input("Do you want to clone the new repository? (y/n): ").strip().lower()
-        if want_to_clone == 'y':
-            bb.cloneNewRepo()
-        else:
-            print("[yellow]Skipping clone operation.")
-    elif choice == "1.1":
-        bb.setRepoName()
-        bb.checkRepoOnOldAccount()
-        bb.checkRepoOnNewAccount()
-    elif choice == "2":
-        bb.setRepoName()
-        bb.checkRepoOnNewAccount()
-        bb.newRepo()
-    elif choice == "3":
-        bb.setRepoName()
-        bb.checkRepoOnNewAccount()
-        bb.cloneNewRepo()
-    elif choice == "4":
-        bb.setRepoName()
-        bb.checkForNewRepo()
-        bb.openPermissionsInBrowser()
-        exit()
-    elif choice == "5":
-        bb.setRepoName()
-        bb.checkRepoOnOldAccount()
-        bb.deleteRepo()
-    elif choice == "6":
-        gh = Github()
-        gh.findRepo()
-        menu()
-    elif choice == "7":
-        gh = Github()
-        gh.setRepoName()
-        gh.checkRepo()
-        gh.cloneRepo()
-    elif choice == "8":
-        gh = Github()
-        gh.createRepo()
-    elif choice == "9":
-        bb = Bitbucket()
-        workspaces = ['blueline2025']
-        bb.fetchWorkspaceRepos(workspaces, 2)
-    else:
-        print("[red]Invalid choice. Please try again.")
+    bb = Bitbucket()
+
+    # if choice == "1":
+    #     bb.setRepoName()
+    #     bb.checkRemoteRepo(old_workspace)
+    #     bb.checkRemoteRepo(new_workspace, 2)
+    #     bb.copyOldRepoToNew()
+    #     want_to_clone = input("Do you want to clone the new repository? (y/n): ").strip().lower()
+    #     if want_to_clone == 'y':
+    #         bb.cloneNewRepo()
+    #     else:
+    #         print("[yellow]Skipping clone operation.")
+    # elif choice == "1.1":
+    #     bb.setRepoName()
+    #     bb.checkRepoOnOldAccount()
+    #     bb.checkRepoOnNewAccount()
+    # elif choice == "2":
+    #     bb.setRepoName()
+    #     bb.checkRepoOnNewAccount()
+    #     bb.newRepo()
+    # elif choice == "3":
+    #     bb.setRepoName()
+    #     bb.checkRepoOnNewAccount()
+    #     bb.cloneNewRepo()
+    # elif choice == "4":
+    #     bb.setRepoName()
+    #     bb.checkForNewRepo()
+    #     bb.openPermissionsInBrowser()
+    #     exit()
+    # elif choice == "5":
+    #     bb.setRepoName()
+    #     bb.checkRepoOnOldAccount()
+    #     bb.deleteRepo()
+    # elif choice == "6":
+    #     gh = Github()
+    #     gh.findRepo()
+    #     menu()
+    # elif choice == "7":
+    #     gh = Github()
+    #     gh.setRepoName()
+    #     gh.checkRepo()
+    #     gh.cloneRepo()
+    # elif choice == "8":
+    #     gh = Github()
+    #     gh.createRepo()
+    # elif choice == "9":
+    #     bb = Bitbucket()
+    #     workspaces = ['blueline2025']
+    #     bb.fetchWorkspaceRepos(workspaces, 2)
+    # else:
+    #     print("[red]Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     menu()

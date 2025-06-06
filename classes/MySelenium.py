@@ -8,9 +8,7 @@ from selenium.common.exceptions import TimeoutException
 import requests
 import time
 
-from classes.MyConfig import MyConfig
-
-class MySelenium(MyConfig):
+class MySelenium():
     def __init__(self):
         super().__init__()  # <-- This initializes MyConfig
         self.service = Service(executable_path='/usr/bin/chromedriver')
@@ -37,45 +35,6 @@ class MySelenium(MyConfig):
             if (items.every(e => e.state === "COMPLETE"))
                 return items.map(e => e.fileUrl || e.file_url);
         """)
-
-
-    def loginToBitbucket(self, repo_name):
-        repo_name = repo_name.strip()
-        self.driver.get(self.sitem_login)
-        self.driver.implicitly_wait(10)
-        login_input = self.driver.find_element(By.CSS_SELECTOR, "#form-login [name='username']")
-        login_input.send_keys(self.bitbucket_login)
-        button_submit = self.driver.find_element(By.CSS_SELECTOR, "#login-submit")
-        button_submit.click()
-
-        submit_input = self.driver.find_element(By.CSS_SELECTOR, "input#password")
-        self.driver.implicitly_wait(10)
-        submit_input.send_keys(self.bitbucket_password)
-        button_submit.click()
-
-        time.sleep(10000)
-
-    def loginToSite(self):
-        while True:
-            req = requests.get(self.sitem_login)
-            if req.status_code != requests.codes['ok']:
-                self.sitem_login = f"{self.account_url}/wp-admin"
-                break
-            else:
-                break
-
-    def accessGroup(self):
-        print(self.new_login_name, self.new_password)
-        self.loginToSite()
-        self.driver.get(self.sitem_login)
-        self.waitForCaptcha()
-        login_element = self.driver.find_element(By.ID, "user_login")
-        login_element.send_keys(self.new_login_name)
-        password_element = self.driver.find_element(By.ID, "user_pass")
-        password_element.send_keys(self.new_password)
-        login_button = self.driver.find_element(By.ID, "wp-submit")
-        login_button.click()
-        time.sleep(2)
 
     # def makeBackupInChrome(self):
     #     self.loginToSite()
