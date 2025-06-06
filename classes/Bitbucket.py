@@ -76,7 +76,6 @@ class Bitbucket():
             if not values:
                 self.prettyPrint("No more repositories to fetch.", error=True)
                 break
-            self.prettyPrint(f"Page {count} - Fetched {len(values)} repositories")
             # Optionally save the raw data
             with open(f"data_page_{count}.json", "w") as f:
                 f.write(response.text)
