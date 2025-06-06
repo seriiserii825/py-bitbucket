@@ -23,6 +23,17 @@ class Bitbucket():
         self.initData("bludelego@gmail.com")
         self.auth = HTTPBasicAuth(self.username, self.app_password)
 
+    def prettyPrint(self,value, error=False):
+        if error:
+            print("[red]===============================")
+            print(value)
+            print("[red]===============================")
+        else:
+            print("[blue]===============================")
+            print(value)
+            print("[blue]===============================")
+
+
     def initData(self, email):
         data = getRepoData(email, self.ROOT_DIR)
         self.workspace = data["workspace"]
@@ -32,7 +43,7 @@ class Bitbucket():
         self.is_private = data["is_private"]
 
         if not data:
-            print(f"no data found for email {email}")
+            self.prettyPrint(f"no data found for email {email}")
             exit()
 
     # def checkRemoteRepo(self):
@@ -252,9 +263,9 @@ class Bitbucket():
                 workspaces.append(workspace)
             workspace = fzf.prompt(workspaces)
             self.workspace = workspace[0]
-            print(f"Choosed workspace {self.workspace}")
+            self.prettyPrint(f"Selected workspace: {self.workspace}")
         else:
-            print("Failed to list workspaces.")
+            self.prettyPrint(response.text, error=True)
             print(response.text)
             exit()
     #
