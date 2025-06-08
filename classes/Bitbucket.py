@@ -76,6 +76,39 @@ class Bitbucket():
             return
         self.workspace = selectOne(self.workspaces)
 
+    def fetch_workspace_repos(self) -> None:
+        """
+        Fetches all repositories in the selected workspace.
+        """
+        if not self.workspace:
+            raise AccountException(
+                "Workspace not selected. Please choose a workspace first.")
+        if not self.account:
+            raise AccountException(
+                "Account not selected. Please choose an account first.")
+        ba = BitbucketApi(
+            username=self.account.username,
+            app_password=self.account.app_password,
+        )
+        self.workspaces = ba.fetch_workspace_repos(self.workspace)
+
+    def list_repos(self) -> None:
+        """
+        Lists all repositories in the selected workspace.
+        """
+        if not self.workspaces:
+            pretty_print("No repositories found.", error=True)
+            return
+        table_title = f"Repositories in Workspace: {self.workspace}"
+        table_columns = ["Index", "Repository"]
+        table_rows = [[str(i), repo]
+                      for i, repo in enumerate(self.workspaces, start=1)]
+        pretty_table(
+            title=table_title,
+            columns=table_columns,
+            rows=table_rows,
+        )
+
     # def fetchWorkspaceRepos(self):
     #     repos = []
     #     url = (

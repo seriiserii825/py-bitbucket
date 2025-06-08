@@ -3,7 +3,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from execeptions.BitbucketApiException import BitbucketApiException
-from utils import pretty_print, selectOne
+from utils import pretty_print
 
 
 class BitbucketApi:
@@ -28,7 +28,8 @@ class BitbucketApi:
                 f"Error fetching workspaces: {response.status_code} {response.text}"
             )
 
-    def fetch_workspace_repos(self):
+    def fetch_workspace_repos(self, workspace):
+        self.workspace = workspace
         """
         Fetch all repositories in the Bitbucket workspace.
         """

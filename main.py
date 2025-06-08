@@ -35,6 +35,9 @@ def menu():
         pretty_print(f"[red]Error fetching workspaces: {e}", error=True)
         return
 
+    bb.fetch_workspace_repos()
+    bb.list_repos()
+
     # bb.initData(old_email)
     # bb.chooseWorkspaces()
     # # bb.showRepos()
