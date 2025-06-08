@@ -18,18 +18,15 @@ def menu():
     # print("[yellow]8. Create repo github")
     # print("[blue]9. List repos")
 
-    # choice = input("Enter your choice: ")
-    old_email = "bludelego@gmail.com"
-    new_email = "radu@blueline.md"
-
-    # bb = Bitbucket('seriiburduja@gmail.com')
     bb = Bitbucket('bludelego@gmail.com')
     try:
         bb.choose_account_by_email()
-        bb.printInitData()
+        bb.printAccountByAlreadySelectedEmail()
     except AccountException as e:
         print(f"[red]{e}")
         return
+
+
     # bb.initData(old_email)
     # bb.chooseWorkspaces()
     # # bb.showRepos()

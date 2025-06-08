@@ -15,11 +15,17 @@ fzf = FzfPrompt()
 
 class Bitbucket():
     def __init__(self, email):
+        """
+        Initializes the Bitbucket class with an email.
+        """
         self.email = email
         self.account: AccountType | None = None
         # self.auth = HTTPBasicAuth(self.username, self.app_password)
 
-    def printInitData(self):
+    def printAccountByAlreadySelectedEmail(self):
+        """
+        Prints the initial data for the Bitbucket account.
+        """
         ac = AccountsCsv()
         ac.print_account_values_by_email(self.email)
 
