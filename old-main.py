@@ -1,5 +1,7 @@
+from classes.Bitbucket import Bitbucket
+from classes.Github import Github
+from classes.MySelenium import MySelenium
 from rich import print
-
 
 def menu():
     print("[green]1. Show repo with fzf")
@@ -15,6 +17,7 @@ def menu():
     # print("[yellow]8. Create repo github")
     # print("[blue]9. List repos")
 
+
     choice = input("Enter your choice: ")
     old_email = "bludelego@gmail.com"
     new_email = "radu@blueline.md"
@@ -26,9 +29,15 @@ def menu():
     # bb.searchRepo()
 
     if choice == "1":
-        pass
+        bb = Bitbucket()
+        bb.initData()
+        bb.chooseWorkspaces()
+        bb.showRepos()
     elif choice == "2":
-        pass
+        bb = Bitbucket()
+        bb.initData()
+        bb.chooseWorkspaces()
+        bb.searchRepo()
 
     # if choice == "1":
     #     bb.setRepoName()
@@ -79,7 +88,6 @@ def menu():
     #     bb.fetchWorkspaceRepos(workspaces, 2)
     # else:
     #     print("[red]Invalid choice. Please try again.")
-
 
 if __name__ == "__main__":
     menu()
