@@ -1,9 +1,12 @@
 from rich import print
 
+from classes.Bitbucket import Bitbucket
+from execeptions.AccountException import AccountException
+
 
 def menu():
-    print("[green]1. Show repo with fzf")
-    print("[green]2. Search repo by word")
+    # print("[green]1. Show repo with fzf")
+    # print("[green]2. Search repo by word")
     # print("[green]1. Copy old repo to bitbucket2025")
     # print("[green]1.1 Check repository")
     # print("[blue]2. Create new repository")
@@ -15,20 +18,25 @@ def menu():
     # print("[yellow]8. Create repo github")
     # print("[blue]9. List repos")
 
-    choice = input("Enter your choice: ")
+    # choice = input("Enter your choice: ")
     old_email = "bludelego@gmail.com"
     new_email = "radu@blueline.md"
 
-    # bb = Bitbucket()
+    bb = Bitbucket('seriiburduja@gmail.com')
+    try:
+        bb.printInitData()
+    except AccountException as e:
+        print(f"[red]{e}")
+        return
     # bb.initData(old_email)
     # bb.chooseWorkspaces()
     # # bb.showRepos()
     # bb.searchRepo()
 
-    if choice == "1":
-        pass
-    elif choice == "2":
-        pass
+    # if choice == "1":
+    #     pass
+    # elif choice == "2":
+    #     pass
 
     # if choice == "1":
     #     bb.setRepoName()

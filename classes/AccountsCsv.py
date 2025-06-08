@@ -2,6 +2,7 @@ import csv
 import os
 from typing import List
 
+from execeptions.AccountException import AccountException
 from my_types.account_type import AccountType
 
 
@@ -13,6 +14,8 @@ class AccountsCsv:
         self.accounts: List[AccountType] = []
 
     def from_file_to_array(self):
+        if not os.path.exists(self.file_path):
+            raise AccountException(f"File {self.file_path} does not exist.")
         rows = []
         with open(self.file_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
@@ -27,7 +30,19 @@ class AccountsCsv:
         for account in self.accounts:
             if account.email == email:
                 return account
-        return None
+        raise AccountException(f"Account with email {email} not found.")
+
+    def print_account_values_by_email(self, email):
+        account = self.get_account_by_email(email)
+        if account:
+            print(f"Email: {account.email}")
+            print(f"Workspace: {account.workspace}")
+            print(f"Project Key: {account.project_key}")
+            print(f"Username: {account.username}")
+            print(f"App Password: {account.app_password}")
+            print(f"Is Private: {account.is_private}")
+        else:
+            print("Account not found.")
 
 
 #
