@@ -1,4 +1,8 @@
 from simple_term_menu import TerminalMenu
+from rich.console import Console
+from rich.table import Table
+
+from my_types.table_type import TableColumn
 
 
 def selectOne(options: list[str]) -> str:
@@ -41,3 +45,16 @@ def pretty_print(value, error=False):
         print("[blue]===============================")
         print(value)
         print("[blue]===============================")
+
+
+def pretty_table(title: str, columns: list[str], rows: list[list[str]]):
+    table = Table(title=title)
+
+    for column in columns:
+        table.add_column(column, style="white")
+
+    for row in rows:
+        table.add_row(*row)
+
+    console = Console()
+    console.print(table)

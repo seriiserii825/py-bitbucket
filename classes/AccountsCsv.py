@@ -4,7 +4,7 @@ from typing import List
 
 from execeptions.AccountException import AccountException
 from my_types.account_type import AccountType
-from utils import selectOne
+from utils import pretty_table, selectOne
 
 
 class AccountsCsv:
@@ -59,13 +59,19 @@ class AccountsCsv:
         Prints the values of an account by email from the accounts.csv file.
         """
         account = self.get_account_by_email(email)
+        table_title = "Account Details"
+        table_headers = ["Email", "Workspace", "Project Key",
+                         "Username", "App Password", "Is Private"]
+        table_rows = [
+            account.email,
+            account.workspace,
+            account.project_key,
+            account.username,
+            account.app_password,
+            str(account.is_private)
+        ]
         if account:
-            print(f"Email: {account.email}")
-            print(f"Workspace: {account.workspace}")
-            print(f"Project Key: {account.project_key}")
-            print(f"Username: {account.username}")
-            print(f"App Password: {account.app_password}")
-            print(f"Is Private: {account.is_private}")
+            pretty_table(table_title, table_headers, [table_rows])
         else:
             print("Account not found.")
 
