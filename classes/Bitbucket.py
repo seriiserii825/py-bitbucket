@@ -3,11 +3,11 @@ import os
 from rich import print
 from requests.auth import HTTPBasicAuth
 from classes.AccountsCsv import AccountsCsv
+from execeptions.AccountException import AccountException
 from modules.getRepoData import getRepoData
 from pyfzf.pyfzf import FzfPrompt
 
 from my_types.account_type import AccountType
-from utils import pretty_print
 
 
 fzf = FzfPrompt()
@@ -21,8 +21,14 @@ class Bitbucket():
 
     def printInitData(self):
         ac = AccountsCsv()
-        ac.from_file_to_array()
         ac.print_account_values_by_email(self.email)
+
+    def choose_account_by_email(self):
+        """
+        Choose an account by email from the accounts.csv file.
+        """
+        ac = AccountsCsv()
+        self.account = ac.choose_account_by_email()
 
     # def initData(self):
     #     accounts = getRepoData(self.ROOT_DIR)

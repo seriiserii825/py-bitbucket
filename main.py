@@ -25,6 +25,7 @@ def menu():
     # bb = Bitbucket('seriiburduja@gmail.com')
     bb = Bitbucket('bludelego@gmail.com')
     try:
+        bb.choose_account_by_email()
         bb.printInitData()
     except AccountException as e:
         print(f"[red]{e}")
