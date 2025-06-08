@@ -2,6 +2,8 @@ from rich import print
 
 from classes.Bitbucket import Bitbucket
 from execeptions.AccountException import AccountException
+from execeptions.BitbucketApiException import BitbucketApiException
+from utils import pretty_print
 
 
 def menu():
@@ -26,6 +28,12 @@ def menu():
         print(f"[red]{e}")
         return
 
+    try:
+        bb.get_workspaces_from_api()
+        bb.select_workspace()
+    except BitbucketApiException as e:
+        pretty_print(f"[red]Error fetching workspaces: {e}", error=True)
+        return
 
     # bb.initData(old_email)
     # bb.chooseWorkspaces()

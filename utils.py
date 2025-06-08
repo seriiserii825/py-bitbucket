@@ -2,8 +2,6 @@ from simple_term_menu import TerminalMenu
 from rich.console import Console
 from rich.table import Table
 
-from my_types.table_type import TableColumn
-
 
 def selectOne(options: list[str]) -> str:
     """

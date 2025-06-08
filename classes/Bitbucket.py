@@ -3,11 +3,13 @@ import os
 from rich import print
 from requests.auth import HTTPBasicAuth
 from classes.AccountsCsv import AccountsCsv
+from classes.BitbucketApi import BitbucketApi
 from execeptions.AccountException import AccountException
 from modules.getRepoData import getRepoData
 from pyfzf.pyfzf import FzfPrompt
 
 from my_types.account_type import AccountType
+from utils import pretty_print, pretty_table, selectOne
 
 
 fzf = FzfPrompt()
@@ -20,6 +22,8 @@ class Bitbucket():
         """
         self.email = email
         self.account: AccountType | None = None
+        self.workspaces: list[str] = []
+        self.workspace: str | None = None
         # self.auth = HTTPBasicAuth(self.username, self.app_password)
 
     def printAccountByAlreadySelectedEmail(self):
@@ -36,35 +40,42 @@ class Bitbucket():
         ac = AccountsCsv()
         self.account = ac.choose_account_by_email()
 
-    # def initData(self):
-    #     accounts = getRepoData(self.ROOT_DIR)
-    #     emails = [account["email"] for account in accounts]
-    #     input_message = "Choose an email from the list or type 'y' \
-    #                     to select from the list: "
-    #     aggree = input(input_message).strip().lower()
-    #     if aggree != 'y':
-    #         email = "bludelego@gmail.com"
-    #     else:
-    #         email = fzf.prompt(emails)
-    #         email = email[0]  # Get the first selected email
-    #     print(f'email: {email}')
-    #     data = next(
-    #         (account for account in accounts if account["email"] == email), None)
-    #     if not data:
-    #         pretty_print(
-    #             f"No account found for email {email}", error=True)
-    #         exit()
-    #     print(f'data: {data}')
-    #     self.workspace = data["workspace"]
-    #     self.project_key = data["project_key"]
-    #     self.username = data["username"]
-    #     self.app_password = data["app_password"]
-    #     self.is_private = data["is_private"]
-    #     self.auth = HTTPBasicAuth(self.username, self.app_password)
-    #     if not data:
-    #         pretty_print(f"no data found for email {email}")
-    #         exit()
-    #
+    def get_workspaces_from_api(self):
+        if not self.account:
+            raise AccountException(
+                "Account not selected. Please choose an account first.")
+        ba = BitbucketApi(
+            username=self.account.username,
+            app_password=self.account.app_password,
+        )
+        self.workspaces = ba.fetch_workspace_list()
+
+    def list_workspaces(self) -> None:
+        """
+        Lists all workspaces associated with the account.
+        """
+        if not self.workspaces:
+            pretty_print("No workspaces found.", error=True)
+            return
+        table_title = "Available Workspaces"
+        table_columns = ["Index", "Workspace"]
+        table_rows = [[str(i), workspace]
+                      for i, workspace in enumerate(self.workspaces, start=1)]
+        pretty_table(
+            title=table_title,
+            columns=table_columns,
+            rows=table_rows,
+        )
+
+    def select_workspace(self) -> None:
+        """
+        Selects a workspace from the list of available workspaces.
+        """
+        if not self.workspaces:
+            pretty_print("No workspaces found.", error=True)
+            return
+        self.workspace = selectOne(self.workspaces)
+
     # def fetchWorkspaceRepos(self):
     #     repos = []
     #     url = (
