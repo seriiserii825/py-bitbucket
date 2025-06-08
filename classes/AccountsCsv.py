@@ -21,7 +21,15 @@ class AccountsCsv:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 row["is_private"] = row["is_private"].lower() == "true"
-                rows.append(row)
+                account = AccountType(
+                    email=row["email"],
+                    workspace=row["workspace"],
+                    project_key=row["project_key"],
+                    username=row["username"],
+                    app_password=row["app_password"],
+                    is_private=row["is_private"],
+                )
+                rows.append(account)
         self.accounts = rows
 
     def get_account_by_email(self, email):

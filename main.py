@@ -22,7 +22,8 @@ def menu():
     old_email = "bludelego@gmail.com"
     new_email = "radu@blueline.md"
 
-    bb = Bitbucket('seriiburduja@gmail.com')
+    # bb = Bitbucket('seriiburduja@gmail.com')
+    bb = Bitbucket('bludelego@gmail.com')
     try:
         bb.printInitData()
     except AccountException as e:
