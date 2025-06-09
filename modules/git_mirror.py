@@ -2,6 +2,7 @@ import os
 import subprocess
 import webbrowser
 
+from classes.Browser import Browser
 from libs.select import selectOne
 
 
@@ -11,8 +12,9 @@ def git_mirror():
     workspace = selectOne(workspaces)
     _clone_repo(repo_name, workspace)
     _cd_cloned_repo(repo_name)
-    _create_repo_in_browser()
-    _edit_group_in_browser(repo_name)
+    bw = Browser(workspace, repo_name)
+    bw.create_repo_in_browser()
+    bw.edit_group_in_browser(workspace, repo_name)
     _push_to_new_repo(repo_name)
     _set_new_origin(repo_name)
     _cd_up()
@@ -31,32 +33,6 @@ def _clone_repo(repo_name: str, workspace: str):
     clone_cmd = ["git", "clone", "--mirror",
                  f"git@bitbucket.org:{workspace}/{repo_name}.git"]
     subprocess.run(clone_cmd, check=True)
-
-
-def _create_repo_in_browser():
-    # Open create repo page in browser
-    create_url = "https://bitbucket.org/blueline-wordpress-sites\
-    /workspace/create/repository"
-    print("Create new repo in blueline-wordpress-sites")
-    print(create_url)
-    webbrowser.open(create_url)
-
-    confirm = input(
-        "Press 'y' when you have created the new repo in blueline-wordpress-sites: ")
-    if confirm.lower() != 'y':
-        print("Aborting...")
-        exit(1)
-
-
-def _edit_group_in_browser(repo_name: str):
-    print("Add group blueline-wordpress-sites to your Bitbucket account if you don't have it yet.")
-    group_url = f"https://bitbucket.org/blueline-wordpress-sites/{repo_name}/admin/permissions"
-    print(group_url)
-    webbrowser.open(group_url)
-    confirm = input("Press 'y' when you have added the group: ")
-    if confirm.lower() != 'y':
-        print("Aborting...")
-        exit(1)
 
 
 def _push_to_new_repo(repo_name: str):
@@ -88,7 +64,9 @@ def _cd_up():
 
 def _success(repo_name: str):
     print(
-        f"Repository {repo_name} has been cloned and pushed to blueline-wordpress-sites.")
+        f"Repository {repo_name} has been\
+        cloned and pushed to blueline-wordpress-sites."
+    )
     print("Go and delete old repo in blueline2025.")
 
 

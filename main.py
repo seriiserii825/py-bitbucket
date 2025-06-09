@@ -1,5 +1,6 @@
 from rich import print
 from classes.Bitbucket import Bitbucket
+from classes.Browser import Browser
 from execeptions.BitbucketException import BitbucketException
 from modules.git_mirror import git_mirror
 from utils import pretty_table
@@ -12,6 +13,7 @@ def menu():
         ["1", "Git Mirror"],
         ["2", "Repos to File"],
         ["3", "Find Repo in File"],
+        ["4", "Create new repo in browser"],
     ]
     pretty_table(table_header, table_columns, table_rows)
 
@@ -28,6 +30,18 @@ def menu():
             bb.find_repo_from_file()
         except BitbucketException as e:
             print(f"[red]Error: {e}[/red]")
+        menu()
+    elif choice == "4":
+        bb = Bitbucket()
+        try:
+            repo_name = bb.new_repo()
+            workspace = bb.select_workspace()
+            bw = Browser(bb.workspace, repo_name)
+            bw.create_repo_in_browser()
+            bw.edit_group_in_browser(workspace, repo_name)
+        except BitbucketException as e:
+            print(f"[red]Error: {e}[/red]")
+        menu()
     else:
         print("[red]Invalid choice! Please try again.[/red]")
         menu()

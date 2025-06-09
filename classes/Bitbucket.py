@@ -112,7 +112,19 @@ class Bitbucket():
                 repos.append(RepoType(name=row[0], workspace=row[1]))
         return repos
 
-    def newRepo(self):
+    def _get_workspaces_from_file(self) -> list[str]:
+        repos = self._get_repos_from_file()
+        workspaces = set(repo.workspace for repo in repos)
+        return list(workspaces)
+
+    def select_workspace(self) -> str:
+        workspaces = self._get_workspaces_from_file()
+        if not workspaces:
+            raise BitbucketException("No workspaces found.")
+        workspace = fzf.prompt(workspaces)
+        return workspace
+
+    def new_repo(self):
         account = self._choose_account_by_email()
         bb_api = BitbucketApi(account.username, account.app_password)
         repo_name = input("Enter the new repository name: ")
@@ -128,18 +140,12 @@ class Bitbucket():
             print(
                 f"[green]✅ Repository '{repo_name}' created successfully!")
             self.is_in_new_account = True
+            return repo_name
         else:
-            print(
-                f"[red]❌ Failed to create repository. Status code: {new_repo.status_code}")
-            print(new_repo.json())
-
-        def openPermissionsInBrowser(self, workspace, repo_name):
-            if not self.is_in_new_account:
-                print("[red]❌ Repository does not exist on the new account. Cannot open permissions in browser.")
-                return
-            url = f"https://bitbucket.org/{self.new_workspace}/{self.repo_name}/admin/access"
-            print(f"Opening permissions page for {self.repo_name} in browser...")
-            os.system(f"google-chrome-stable {url}")
+            raise BitbucketException(
+                f"Failed to create repository '{repo_name}'. "
+                f"Status code: {new_repo.status_code}"
+            )
     #
     # def cloneNewRepo(self):
     #     repo_url = f"git clone git@bitbucket.org:blueline2025/{self.repo_name}.git"
