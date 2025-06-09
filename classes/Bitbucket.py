@@ -139,26 +139,3 @@ class Bitbucket():
                 f"Failed to create repository '{repo_name}'. "
                 f"Status code: {new_repo.status_code}"
             )
-    #
-    # def cloneNewRepo(self):
-    #     repo_url = f"git clone git@bitbucket.org:blueline2025/{self.repo_name}.git"
-    #     # go to downloads
-    #     os.chdir(os.path.expanduser("~/Downloads"))
-    #     # clone the new repo
-    #     os.system(repo_url)
-    #
-    # def pushNewRepo(self):
-    #     if not self.is_in_old_account:
-    #         print("[red]❌ Repository does not exist on the old account. Cannot push to new repository.")
-    #         return
-    #
-    #     old_repo_path = os.path.join(os.path.expanduser("~/Downloads"), self.repo_name + ".git")
-    #     os.chdir(old_repo_path)
-    #     push_command = f"git push --mirror git@bitbucket.org:blueline2025/{self.repo_name}.git"
-    #     print(f"Executing command: {push_command}")
-    #     agree = input("Do you want to push the changes to the new repo? (y/n): ")
-    #     if agree.lower() != 'y':
-    #         print("Push aborted.")
-    #         return
-    #     os.system(push_command)
-    #

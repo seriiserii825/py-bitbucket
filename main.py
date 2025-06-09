@@ -1,7 +1,7 @@
 from rich import print
 from modules.git_mirror import git_mirror
 from utils import pretty_table
-from views import clone_from_github, create_repo_on_github, delete_reop_on_github
+from views import clone_from_github, create_repo_on_github, delete_reop_on_github, from_bitbucket_to_github
 from views import create_new_repo_in_bitbucket, find_repo_in_file, repos_to_file
 
 
@@ -10,12 +10,13 @@ def menu():
     table_columns = ["Index", "Option"]
     table_rows = [
         ["1", "Git Mirror"],
-        ["2", "Repos to File"],
+        ["2", "Bitbucket repos to File"],
         ["3", "Find Repo in File"],
         ["4", "Create new repo on bitbucket"],
         ["5", "Clone from github"],
         ["6", "Create repo on github"],
-        ["7", "Delete repo on github"]
+        ["7", "Delete repo on github"],
+        ["8", "From bitbucket to github"]
     ]
     pretty_table(table_header, table_columns, table_rows)
 
@@ -37,6 +38,8 @@ def menu():
         create_repo_on_github()
     elif choice == "7":
         delete_reop_on_github()
+    elif choice == "8":
+        from_bitbucket_to_github()
     else:
         print("[red]Invalid choice! Please try again.[/red]")
         menu()

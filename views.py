@@ -41,7 +41,7 @@ def clone_from_github():
 def create_repo_on_github():
     gth = Github()
     try:
-        gth.create_repo()
+        gth.create_repo_from_folder()
     except GithubException as e:
         print(f"[red]Error: {e}[/red]")
 
@@ -50,5 +50,15 @@ def delete_reop_on_github():
     gth = Github()
     try:
         gth.delete_repo()
+    except GithubException as e:
+        print(f"[red]Error: {e}[/red]")
+
+
+def from_bitbucket_to_github():
+    gth = Github()
+    try:
+        repo_name = gth.clone_mirror_from_bitbucket()
+        gth.create_repo_by_arg(repo_name)
+        gth.push_mirror_to_github(repo_name)
     except GithubException as e:
         print(f"[red]Error: {e}[/red]")

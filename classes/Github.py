@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 from execeptions.GithubException import GithubException
+from modules.git_mirror import clone_mirror_from_bitbucket
 
 
 class Github:
@@ -75,18 +76,24 @@ class Github:
         except subprocess.CalledProcessError as e:
             print(f"[red]❌ Failed to clone repository: {e}")
 
-    def create_repo(self):
+    def create_repo_from_folder(self):
         folder_name = os.path.basename(os.getcwd())
         agree = input(
             f"From current folder name, '{folder_name}', are you agree, (y/n): ").strip().lower()
         if agree != 'y':
             exit("Exiting without creating repository.")
+        self._create_repo(folder_name)
+        self._push_created_repo(folder_name)
 
+    def create_repo_by_arg(self, repo_name: str):
+        self._create_repo(repo_name)
+
+    def _create_repo(self, repo_name: str):
         USERNAME = self._get_data_from_env("GITHUB_USERNAME")
         TOKEN = self._get_data_from_env("GITHUB_TOKEN")
 
         repo_data = {
-            "name": folder_name,
+            "name": repo_name,
             "description": "Created via Python script",
             "private": False  # Set to True for a private repository
         }
@@ -107,8 +114,10 @@ class Github:
             raise GithubException(
                 f"Error creating repository: \
                 {response.json().get('message', 'Unknown error')}")
+
+    def _push_created_repo(self, repo_name: str):
         try:
-            repo_url = f"git@github.com:seriiserii825/{folder_name}.git"
+            repo_url = f"git@github.com:seriiserii825/{repo_name}.git"
             os.system("touch README.md")
             subprocess.run(["git", "init"], check=True)
             subprocess.run(["git", "add", "."], check=True)
@@ -158,3 +167,30 @@ class Github:
         if not api_key:
             raise GithubException(f"{key} is empty in .env file.")
         return api_key
+
+    def clone_mirror_from_bitbucket(self) -> str:
+        repo_name, _ = clone_mirror_from_bitbucket()
+        return repo_name
+
+    def push_mirror_to_github(self, repo_name):
+        current_dir = os.getcwd()
+        print(f"Current directory: {current_dir}")
+        USERNAME = self._get_data_from_env("GITHUB_USERNAME")
+        url = f"git push --mirror git@github.com:{USERNAME}/{repo_name}.git"
+
+        try:
+            subprocess.run(url, shell=True, check=True)
+            print(f"✅ Successfully pushed mirror to GitHub: {repo_name}")
+        except subprocess.CalledProcessError as e:
+            raise GithubException(
+                f"[red]❌ Failed to push mirror to GitHub: {e}[/red]"
+            )
+
+    def _set_new_origin(self, repo_name: str, user_name: str):
+        remote_url = f"git@github.com:{user_name}/{repo_name}.git"
+        set_url_cmd = ["git", "remote", "set-url", "origin", remote_url]
+        try:
+            subprocess.run(set_url_cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error setting new origin URL: {e}")
+            exit(1)

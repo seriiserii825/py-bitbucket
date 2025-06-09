@@ -7,11 +7,7 @@ from libs.select import selectOne
 
 
 def git_mirror():
-    repo_name = _get_repo_name()
-    workspaces = ["blueline2025", "sites-bludelego", "seriiserii825"]
-    workspace = selectOne(workspaces)
-    _clone_repo(repo_name, workspace)
-    _cd_cloned_repo(repo_name)
+    repo_name, workspace = clone_mirror_from_bitbucket()
     bw = Browser(workspace, repo_name)
     bw.create_repo_in_browser()
     bw.edit_group_in_browser(workspace, repo_name)
@@ -19,6 +15,15 @@ def git_mirror():
     _set_new_origin(repo_name)
     _cd_up()
     _success(repo_name)
+
+
+def clone_mirror_from_bitbucket():
+    repo_name = _get_repo_name()
+    workspaces = ["blueline2025", "sites-bludelego", "seriiserii825"]
+    workspace = selectOne(workspaces)
+    _clone_repo(repo_name, workspace)
+    _cd_cloned_repo(repo_name)
+    return (repo_name, workspace)
 
 
 def _get_repo_name() -> str:
@@ -30,21 +35,19 @@ def _get_repo_name() -> str:
 
 
 def _clone_repo(repo_name: str, workspace: str):
-    clone_cmd = ["git", "clone", "--mirror",
-                 f"git@bitbucket.org:{workspace}/{repo_name}.git"]
-    subprocess.run(clone_cmd, check=True)
+    command = f"git clone --mirror git@bitbucket.org:{workspace}/{repo_name}.git"
+    print(f"command: {command}")
+    os.system(command)
 
 
 def _push_to_new_repo(repo_name: str):
     repo_url = f"git@bitbucket.org:blueline-wordpress-sites/{repo_name}.git"
-    print(f"repo_url: {repo_url}")
-    push_cmd = ["git", "push", "--mirror", repo_url]
-    # check_for_errors with raise error
+    command = f"git push --mirror {repo_url}"
     try:
-        subprocess.run(push_cmd, check=True)
-    except subprocess.CalledProcessError as e:
+        os.system(command)
+    except Exception as e:
         print(f"Error pushing to new repository: {e}")
-        _change_main_barnch_in_browser(repo_name)
+        exit(1)
 
 
 def _set_new_origin(repo_name: str):
