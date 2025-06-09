@@ -1,7 +1,10 @@
+import os
 import requests
 import subprocess
+from dotenv import load_dotenv
+from pathlib import Path
 
-from githubData import githubData
+from execeptions.GithubException import GithubException
 
 
 class Github:
@@ -72,48 +75,41 @@ class Github:
         except subprocess.CalledProcessError as e:
             print(f"[red]❌ Failed to clone repository: {e}")
 
-    def createRepo(self):
-        """
-        Creates a new repository on GitHub and pushes the current code to it.
-        Repo name is set by folder name
-        """
-        folder_name = subprocess.run(
-            ["basename", "$PWD"], capture_output=True, text=True, shell=True).stdout.strip()
-        print(f"folder_name: {folder_name}")
+    def create_repo(self):
+        folder_name = os.path.basename(os.getcwd())
         agree = input(
-            f"Repo name will be from current folder name, {folder_name}, are you agree, (y/n): ").strip().lower()
+            f"From current folder name, '{folder_name}', are you agree, (y/n): ").strip().lower()
         if agree != 'y':
             exit("Exiting without creating repository.")
-        data = githubData()
-        token = data["token"]
-        # get current folder name
-        repo_name = folder_name
-        username = "seriiserii825"
-        description = "Repo created using Python script"
-        private = True
+
+        USERNAME = self._get_data_from_env("GITHUB_USERNAME")
+        TOKEN = self._get_data_from_env("GITHUB_TOKEN")
+
+        repo_data = {
+            "name": folder_name,
+            "description": "Created via Python script",
+            "private": False  # Set to True for a private repository
+        }
 
         url = "https://api.github.com/user/repos"
-        headers = {
-            "Authorization": f"token {token}",
-            "Accept": "application/vnd.github.v3+json"
-        }
-        payload = {
-            "name": repo_name,
-            "description": description,
-            "private": private
-        }
 
-        response = requests.post(url, json=payload, headers=headers)
+        response = requests.post(
+            url,
+            json=repo_data,
+            auth=(USERNAME, TOKEN)
+        )
 
         if response.status_code == 201:
-            print(f"✅ Repository '{repo_name}' created on GitHub.")
-            repo_url = f"https://github.com/{username}/{repo_name}.git"
+            print(f"✅ Repository '{repo_data['name']}' created successfully.")
+            print(f"🔗 URL: {response.json()['html_url']}")
         else:
             print(f"❌ Failed to create repository: {response.status_code}")
-            print(response.json())
-            exit(1)
-
+            raise GithubException(
+                f"Error creating repository: \
+                {response.json().get('message', 'Unknown error')}")
         try:
+            repo_url = f"git@github.com:seriiserii825/{folder_name}.git"
+            os.system("touch README.md")
             subprocess.run(["git", "init"], check=True)
             subprocess.run(["git", "add", "."], check=True)
             subprocess.run(
@@ -125,3 +121,40 @@ class Github:
             print("🚀 Code pushed to GitHub!")
         except subprocess.CalledProcessError as e:
             print("❌ Git command failed:", e)
+
+    def delete_repo(self):
+        token = self._get_data_from_env("GITHUB_TOKEN")
+        username = self._get_data_from_env("GITHUB_USERNAME")
+        repo_name = input("Enter the repository name to delete: ")
+        if not repo_name:
+            print("❌ Repository name cannot be empty.")
+            return
+        url = f"https://api.github.com/repos/{username}/{repo_name}"
+        headers = {
+            "Accept": "application/vnd.github.v3+json",
+        }
+
+        response = requests.delete(url, auth=(
+            username, token), headers=headers)
+
+        if response.status_code == 204:
+            print(f"✅ Repository '{repo_name}' deleted successfully.")
+        elif response.status_code == 404:
+            raise GithubException(
+                "Repository not found or insufficient permissions.")
+        else:
+            raise GithubException(
+                f"Failed to delete repository: {response.status_code} - {response.json().get('message', 'Unknown error')}")
+
+    def _get_data_from_env(self, key: str) -> str:
+        current_script_path = Path(__file__).resolve()
+        dotenv_path = current_script_path.parents[1] / '.env'
+        load_dotenv(dotenv_path)
+
+        if not os.getenv(key):
+            raise GithubException(
+                f"{key} not found in .env file.")
+        api_key = os.getenv(key)
+        if not api_key:
+            raise GithubException(f"{key} is empty in .env file.")
+        return api_key

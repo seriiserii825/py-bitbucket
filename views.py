@@ -2,6 +2,7 @@ from classes.Bitbucket import Bitbucket
 from classes.Browser import Browser
 from classes.Github import Github
 from execeptions.BitbucketException import BitbucketException
+from execeptions.GithubException import GithubException
 
 
 def repos_to_file():
@@ -17,7 +18,7 @@ def find_repo_in_file():
         print(f"[red]Error: {e}[/red]")
 
 
-def create_new_repo_in_browser():
+def create_new_repo_in_bitbucket():
     bb = Bitbucket()
     try:
         repo_name = bb.new_repo()
@@ -34,4 +35,20 @@ def clone_from_github():
     try:
         gth.clone_repo()
     except Exception as e:
+        print(f"[red]Error: {e}[/red]")
+
+
+def create_repo_on_github():
+    gth = Github()
+    try:
+        gth.create_repo()
+    except GithubException as e:
+        print(f"[red]Error: {e}[/red]")
+
+
+def delete_reop_on_github():
+    gth = Github()
+    try:
+        gth.delete_repo()
+    except GithubException as e:
         print(f"[red]Error: {e}[/red]")
