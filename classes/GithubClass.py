@@ -16,6 +16,8 @@ class GithubClass:
     def __init__(self):
         self.repo_http = "https://github.com/seriiserii825"
         self.repo_name = ""
+        self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)
 
     def setRepoName(self):
         self.repo_name = input("Enter the repository name: ")
@@ -199,31 +201,24 @@ class GithubClass:
             print(f"Error setting new origin URL: {e}")
             exit(1)
 
-    def export_github_repos_to_csv(self, github_token: str, username: str, output_file='github_repos.csv'):
+    def export_github_repos_to_csv(self):
+        output_file = 'github_repos.csv'
+        file_path = os.path.join(self.ROOT_DIR, output_file)
+        github_token = self._get_data_from_env("GITHUB_TOKEN")
+        username = self._get_data_from_env("GITHUB_USERNAME")
         g = Github(github_token)
 
         try:
             user = g.get_user(username)
             repos = user.get_repos()
 
-            with open(output_file, mode='w', newline='', encoding='utf-8') as file:
+            with open(file_path, mode='w', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
-                writer.writerow(["Name", "Full Name", "Private", "URL", "Description",
-                                "Created At", "Updated At", "Language", "Forks", "Stars", "Archived"])
+                writer.writerow(["Name"])
 
                 for repo in repos:
                     writer.writerow([
                         repo.name,
-                        repo.full_name,
-                        repo.private,
-                        repo.html_url,
-                        repo.description or "",
-                        repo.created_at,
-                        repo.updated_at,
-                        repo.language,
-                        repo.forks_count,
-                        repo.stargazers_count,
-                        repo.archived,
                     ])
 
             print(f"✅ Exported {repos.totalCount} repos to {output_file}")

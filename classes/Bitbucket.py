@@ -8,7 +8,7 @@ from pyfzf.pyfzf import FzfPrompt
 from execeptions.BitbucketException import BitbucketException
 from my_types.account_type import AccountType
 from my_types.repo_type import RepoType
-from utils import pretty_print, pretty_table
+from utils import pretty_print
 
 
 fzf = FzfPrompt()
@@ -41,7 +41,8 @@ class Bitbucket():
             writer.writerow(["Name", "Workspace"])
 
         for workspace in workspaces:
-            repos: list[RepoType] = self._get_repos_by_workspace(workspace, account)
+            repos: list[RepoType] = self._get_repos_by_workspace(
+                workspace, account)
             self._repos_to_file(repos, account)
 
     def _printAccountByEmail(self, email):

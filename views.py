@@ -1,6 +1,6 @@
 from classes.Bitbucket import Bitbucket
 from classes.Browser import Browser
-from classes.Github import Github
+from classes.GithubClass import GithubClass
 from execeptions.BitbucketException import BitbucketException
 from execeptions.GithubException import GithubException
 
@@ -31,7 +31,7 @@ def create_new_repo_in_bitbucket():
 
 
 def clone_from_github():
-    gth = Github()
+    gth = GithubClass()
     try:
         gth.clone_repo()
     except Exception as e:
@@ -39,7 +39,7 @@ def clone_from_github():
 
 
 def create_repo_on_github():
-    gth = Github()
+    gth = GithubClass()
     try:
         gth.create_repo_from_folder()
     except GithubException as e:
@@ -47,7 +47,7 @@ def create_repo_on_github():
 
 
 def delete_reop_on_github():
-    gth = Github()
+    gth = GithubClass()
     try:
         gth.delete_repo()
     except GithubException as e:
@@ -55,10 +55,17 @@ def delete_reop_on_github():
 
 
 def from_bitbucket_to_github():
-    gth = Github()
+    gth = GithubClass()
     try:
         repo_name = gth.clone_mirror_from_bitbucket()
         gth.create_repo_by_arg(repo_name)
         gth.push_mirror_to_github(repo_name)
+    except GithubException as e:
+        print(f"[red]Error: {e}[/red]")
+
+def export_github_repos_to_csv():
+    gth = GithubClass()
+    try:
+        gth.export_github_repos_to_csv()
     except GithubException as e:
         print(f"[red]Error: {e}[/red]")
