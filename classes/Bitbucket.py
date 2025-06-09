@@ -22,14 +22,13 @@ class Bitbucket():
         self.workspace: str | None = None
         self.account: AccountType | None = None
         self.email: str | None = None
-        # self.auth = HTTPBasicAuth(self.username, self.app_password)
 
     def repos_to_file(self) -> None:
-        self.account = self._choose_account_by_email()
+        account = self._choose_account_by_email()
         if not self.account:
             raise AccountException(
                 "Account not selected. Please choose an account first.")
-        self._printAccountByEmail(self.account.email)
+        self._printAccountByEmail(account.email)
         workspaces = self._get_workspaces_from_api()
         file_name = f"{self.account.email}_repos.csv"
         file_path = os.path.join(self.ROOT_DIR, file_name)
@@ -113,13 +112,34 @@ class Bitbucket():
                 repos.append(RepoType(name=row[0], workspace=row[1]))
         return repos
 
-    # def openPermissionsInBrowser(self):
-    #     if not self.is_in_new_account:
-    #         print("[red]❌ Repository does not exist on the new account. Cannot open permissions in browser.")
-    #         return
-    #     url = f"https://bitbucket.org/{self.new_workspace}/{self.repo_name}/admin/access"
-    #     print(f"Opening permissions page for {self.repo_name} in browser...")
-    #     os.system(f"google-chrome-stable {url}")
+    def newRepo(self):
+        account = self._choose_account_by_email()
+        bb_api = BitbucketApi(account.username, account.app_password)
+        repo_name = input("Enter the new repository name: ")
+        if not repo_name:
+            raise BitbucketException("Repository name cannot be empty.")
+
+        new_repo = bb_api._createRepoOnBitbucketApi(
+            workspace=self.workspace,
+            project_key=self.workspace,
+            repo_name=repo_name
+        )
+        if new_repo.status_code in (200, 201):
+            print(
+                f"[green]✅ Repository '{repo_name}' created successfully!")
+            self.is_in_new_account = True
+        else:
+            print(
+                f"[red]❌ Failed to create repository. Status code: {new_repo.status_code}")
+            print(new_repo.json())
+
+        def openPermissionsInBrowser(self, workspace, repo_name):
+            if not self.is_in_new_account:
+                print("[red]❌ Repository does not exist on the new account. Cannot open permissions in browser.")
+                return
+            url = f"https://bitbucket.org/{self.new_workspace}/{self.repo_name}/admin/access"
+            print(f"Opening permissions page for {self.repo_name} in browser...")
+            os.system(f"google-chrome-stable {url}")
     #
     # def cloneNewRepo(self):
     #     repo_url = f"git clone git@bitbucket.org:blueline2025/{self.repo_name}.git"

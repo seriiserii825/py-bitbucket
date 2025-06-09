@@ -57,3 +57,13 @@ class BitbucketApi:
             count += 1
         # Optionally clean up
         return repos
+
+    def _createRepoOnBitbucketApi(self, workspace, project_key, repo_name):
+        url = f"https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_name}"
+        payload = {
+            "scm": "git",
+            "is_private": True,
+            "project": {"key": project_key},
+            "name": repo_name
+        }
+        return requests.post(url, json=payload, auth=self.auth)
