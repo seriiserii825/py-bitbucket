@@ -37,6 +37,7 @@ class AccountsCsv:
 
     def get_account_by_email(self, email) -> AccountType:
         accounts = self._from_file_to_array()
+        print(f"accounts: {accounts}")
         for account in accounts:
             if account.email == email:
                 return account

@@ -25,12 +25,14 @@ class Bitbucket():
 
     def repos_to_file(self) -> None:
         account = self._choose_account_by_email()
-        if not self.account:
+        print(f"account: {account}")
+
+        if not account:
             raise AccountException(
                 "Account not selected. Please choose an account first.")
         self._printAccountByEmail(account.email)
-        workspaces = self._get_workspaces_from_api()
-        file_name = f"{self.account.email}_repos.csv"
+        workspaces = self._get_workspaces_from_api(account)
+        file_name = f"{account.email}_repos.csv"
         file_path = os.path.join(self.ROOT_DIR, file_name)
         self._delete_repo_file(file_path)
 
@@ -39,8 +41,8 @@ class Bitbucket():
             writer.writerow(["Name", "Workspace"])
 
         for workspace in workspaces:
-            repos: list[RepoType] = self._get_repos_by_workspace(workspace)
-            self._repos_to_file(repos)
+            repos: list[RepoType] = self._get_repos_by_workspace(workspace, account)
+            self._repos_to_file(repos, account)
 
     def _printAccountByEmail(self, email):
         ac = AccountsCsv()
@@ -53,31 +55,22 @@ class Bitbucket():
         ac = AccountsCsv()
         return ac.choose_account_by_email()
 
-    def _get_workspaces_from_api(self) -> list[str]:
-        if not self.account:
-            raise AccountException(
-                "Account not selected. Please choose an account first.")
+    def _get_workspaces_from_api(self, account: AccountType) -> list[str]:
         ba = BitbucketApi(
-            username=self.account.username,
-            app_password=self.account.app_password,
+            username=account.username,
+            app_password=account.app_password,
         )
         return ba.fetch_workspace_list()
 
-    def _get_repos_by_workspace(self, workspace) -> list[RepoType]:
-        if not self.account:
-            raise AccountException(
-                "Account not selected. Please choose an account first.")
+    def _get_repos_by_workspace(self, workspace, account) -> list[RepoType]:
         ba = BitbucketApi(
-            username=self.account.username,
-            app_password=self.account.app_password,
+            username=account.username,
+            app_password=account.app_password,
         )
         return ba.fetch_workspace_repos(workspace)
 
-    def _repos_to_file(self, repos: list[RepoType]) -> None:
-        if not self.account:
-            raise AccountException(
-                "Account not selected. Please choose an account first.")
-        file_name = f"{self.account.email}_repos.csv"
+    def _repos_to_file(self, repos: list[RepoType], account) -> None:
+        file_name = f"{account.email}_repos.csv"
         file_path = os.path.join(self.ROOT_DIR, file_name)
         with open(file_path, "a") as f:
             writer = csv.writer(f)

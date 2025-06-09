@@ -3,6 +3,7 @@ import subprocess
 
 from githubData import githubData
 
+
 class Github:
     def __init__(self):
         self.repo_http = "https://github.com/seriiserii825"
@@ -28,13 +29,16 @@ class Github:
             data = response.json()
             total = data.get("total_count", 0)
             if total > 0:
-                print(f"✅ Found {total} repositories in user '{username}' containing '{word_in_repo}':")
+                print(
+                    f"✅ Found {total} repositories in user '{username}' containing '{word_in_repo}':")
                 for repo in data["items"]:
                     print(f"- {repo['full_name']}: {repo['html_url']}")
             else:
-                print(f"❌ No repositories found in user '{username}' containing '{word_in_repo}'.")
+                print(
+                    f"❌ No repositories found in user '{username}' containing '{word_in_repo}'.")
         else:
-            print(f"❌ Failed to search repositories. Status code: {response.status_code}")
+            print(
+                f"❌ Failed to search repositories. Status code: {response.status_code}")
 
     def checkRepo(self):
         url = f"{self.repo_http}/{self.repo_name}"
@@ -43,21 +47,28 @@ class Github:
             print(f"[green]✅ Repository '{self.repo_name}' exists on GitHub.")
             return True
         elif response.status_code == 404:
-            print(f"[red]❌ Repository '{self.repo_name}' does not exist on GitHub.")
+            print(
+                f"[red]❌ Repository '{self.repo_name}' does not exist on GitHub.")
             return False
         else:
-            print(f"[red]❌ Failed to check repository. Status code: {response.status_code}")
+            print(
+                f"[red]❌ Failed to check repository. Status code: {response.status_code}")
             return False
 
-    def cloneRepo(self):
+    def clone_repo(self):
+        repo_name = input("Enter the repository name to clone: ")
+        if not repo_name:
+            print("[red]❌ Repository name cannot be empty.")
+            return
         if not self.checkRepo():
             print("[red]❌ Cannot clone repository that does not exist.")
             return
-        clone_url = f"git@github.com:seriiserii825/{self.repo_name}.git"
+        clone_url = f"git@github.com:seriiserii825/{repo_name}.git"
 
         try:
             subprocess.run(["git", "clone", clone_url], check=True)
-            print(f"[green]✅ Repository '{self.repo_name}' cloned successfully!")
+            print(
+                f"[green]✅ Repository '{self.repo_name}' cloned successfully!")
         except subprocess.CalledProcessError as e:
             print(f"[red]❌ Failed to clone repository: {e}")
 
@@ -66,9 +77,11 @@ class Github:
         Creates a new repository on GitHub and pushes the current code to it.
         Repo name is set by folder name
         """
-        folder_name = subprocess.run(["basename", "$PWD"], capture_output=True, text=True, shell=True).stdout.strip()
+        folder_name = subprocess.run(
+            ["basename", "$PWD"], capture_output=True, text=True, shell=True).stdout.strip()
         print(f"folder_name: {folder_name}")
-        agree = input(f"Repo name will be from current folder name, {folder_name}, are you agree, (y/n): ").strip().lower()
+        agree = input(
+            f"Repo name will be from current folder name, {folder_name}, are you agree, (y/n): ").strip().lower()
         if agree != 'y':
             exit("Exiting without creating repository.")
         data = githubData()
@@ -103,9 +116,11 @@ class Github:
         try:
             subprocess.run(["git", "init"], check=True)
             subprocess.run(["git", "add", "."], check=True)
-            subprocess.run(["git", "commit", "-m", "Initial commit"], check=True)
+            subprocess.run(
+                ["git", "commit", "-m", "Initial commit"], check=True)
             subprocess.run(["git", "branch", "-M", "main"], check=True)
-            subprocess.run(["git", "remote", "add", "origin", repo_url], check=True)
+            subprocess.run(
+                ["git", "remote", "add", "origin", repo_url], check=True)
             subprocess.run(["git", "push", "-u", "origin", "main"], check=True)
             print("🚀 Code pushed to GitHub!")
         except subprocess.CalledProcessError as e:

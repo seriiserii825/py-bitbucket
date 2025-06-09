@@ -8,7 +8,7 @@ from libs.select import selectOne
 
 def git_mirror():
     repo_name = _get_repo_name()
-    workspaces = ["blueline2025", "sites-bludelego"]
+    workspaces = ["blueline2025", "sites-bludelego", "seriiserii825"]
     workspace = selectOne(workspaces)
     _clone_repo(repo_name, workspace)
     _cd_cloned_repo(repo_name)

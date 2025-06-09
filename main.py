@@ -1,6 +1,7 @@
 from rich import print
 from classes.Bitbucket import Bitbucket
 from classes.Browser import Browser
+from classes.Github import Github
 from execeptions.BitbucketException import BitbucketException
 from modules.git_mirror import git_mirror
 from utils import pretty_table
@@ -14,6 +15,7 @@ def menu():
         ["2", "Repos to File"],
         ["3", "Find Repo in File"],
         ["4", "Create new repo in browser"],
+        ["5", "Clone from github"],
     ]
     pretty_table(table_header, table_columns, table_rows)
 
@@ -42,6 +44,12 @@ def menu():
         except BitbucketException as e:
             print(f"[red]Error: {e}[/red]")
         menu()
+    elif choice == "5":
+        gth = Github()
+        try:
+            gth.clone_repo()
+        except Exception as e:
+            print(f"[red]Error: {e}[/red]")
     else:
         print("[red]Invalid choice! Please try again.[/red]")
         menu()
