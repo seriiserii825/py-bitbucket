@@ -25,7 +25,7 @@ def menu():
     elif choice == "3":
         bb = Bitbucket()
         try:
-            bb.show_repo_from_file()
+            bb.find_repo_from_file()
         except BitbucketException as e:
             print(f"[red]Error: {e}[/red]")
     else:

@@ -96,7 +96,7 @@ class Bitbucket():
             return
         os.remove(file_path)
 
-    def show_repo_from_file(self):
+    def find_repo_from_file(self):
         repos = self._get_repos_from_file()
         repos_for_fzf = [f"{repo.name} ({repo.workspace})" for repo in repos]
         selected_repo = fzf.prompt(repos_for_fzf)
