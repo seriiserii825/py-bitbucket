@@ -1,9 +1,4 @@
-from rich import print
-
 from classes.Bitbucket import Bitbucket
-from execeptions.AccountException import AccountException
-from execeptions.BitbucketApiException import BitbucketApiException
-from utils import pretty_print
 
 
 def menu():
@@ -21,22 +16,7 @@ def menu():
     # print("[blue]9. List repos")
 
     bb = Bitbucket('bludelego@gmail.com')
-    try:
-        bb.choose_account_by_email()
-        bb.printAccountByAlreadySelectedEmail()
-    except AccountException as e:
-        print(f"[red]{e}")
-        return
-
-    try:
-        bb.get_workspaces_from_api()
-        bb.select_workspace()
-    except BitbucketApiException as e:
-        pretty_print(f"[red]Error fetching workspaces: {e}", error=True)
-        return
-
-    bb.fetch_workspace_repos()
-    bb.list_repos()
+    bb.init_repo_data()
 
     # bb.initData(old_email)
     # bb.chooseWorkspaces()

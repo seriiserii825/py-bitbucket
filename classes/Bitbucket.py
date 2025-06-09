@@ -1,15 +1,13 @@
-import requests
+import csv
 import os
-from rich import print
-from requests.auth import HTTPBasicAuth
 from classes.AccountsCsv import AccountsCsv
 from classes.BitbucketApi import BitbucketApi
 from execeptions.AccountException import AccountException
-from modules.getRepoData import getRepoData
 from pyfzf.pyfzf import FzfPrompt
 
 from my_types.account_type import AccountType
-from utils import pretty_print, pretty_table, selectOne
+from my_types.repo_type import RepoType
+from utils import pretty_print, pretty_table
 
 
 fzf = FzfPrompt()
@@ -17,30 +15,42 @@ fzf = FzfPrompt()
 
 class Bitbucket():
     def __init__(self, email):
-        """
-        Initializes the Bitbucket class with an email.
-        """
+        self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)
         self.email = email
-        self.account: AccountType | None = None
         self.workspaces: list[str] = []
         self.workspace: str | None = None
+        self.account: AccountType | None = None
         # self.auth = HTTPBasicAuth(self.username, self.app_password)
 
-    def printAccountByAlreadySelectedEmail(self):
-        """
-        Prints the initial data for the Bitbucket account.
-        """
+    def init_repo_data(self) -> None:
+        self._choose_account_by_email()
+        if not self.account:
+            raise AccountException(
+                "Account not selected. Please choose an account first.")
+        self._printAccountByAlreadySelectedEmail()
+        workspaces = self._get_workspaces_from_api()
+        file_name = f"{self.account.email}_repos.csv"
+        file_path = os.path.join(self.ROOT_DIR, file_name)
+        self._delete_repo_file(file_path)
+
+        with open(file_path, "a") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Name", "Workspace"])
+
+        for workspace in workspaces:
+            repos: list[RepoType] = self._get_repos_by_workspace(workspace)
+            self._repos_to_file(repos)
+
+    def _printAccountByAlreadySelectedEmail(self):
         ac = AccountsCsv()
         ac.print_account_values_by_email(self.email)
 
-    def choose_account_by_email(self):
-        """
-        Choose an account by email from the accounts.csv file.
-        """
+    def _choose_account_by_email(self):
         ac = AccountsCsv()
         self.account = ac.choose_account_by_email()
 
-    def get_workspaces_from_api(self):
+    def _get_workspaces_from_api(self) -> list[str]:
         if not self.account:
             raise AccountException(
                 "Account not selected. Please choose an account first.")
@@ -48,41 +58,9 @@ class Bitbucket():
             username=self.account.username,
             app_password=self.account.app_password,
         )
-        self.workspaces = ba.fetch_workspace_list()
+        return ba.fetch_workspace_list()
 
-    def list_workspaces(self) -> None:
-        """
-        Lists all workspaces associated with the account.
-        """
-        if not self.workspaces:
-            pretty_print("No workspaces found.", error=True)
-            return
-        table_title = "Available Workspaces"
-        table_columns = ["Index", "Workspace"]
-        table_rows = [[str(i), workspace]
-                      for i, workspace in enumerate(self.workspaces, start=1)]
-        pretty_table(
-            title=table_title,
-            columns=table_columns,
-            rows=table_rows,
-        )
-
-    def select_workspace(self) -> None:
-        """
-        Selects a workspace from the list of available workspaces.
-        """
-        if not self.workspaces:
-            pretty_print("No workspaces found.", error=True)
-            return
-        self.workspace = selectOne(self.workspaces)
-
-    def fetch_workspace_repos(self) -> None:
-        """
-        Fetches all repositories in the selected workspace.
-        """
-        if not self.workspace:
-            raise AccountException(
-                "Workspace not selected. Please choose a workspace first.")
+    def _get_repos_by_workspace(self, workspace) -> list[RepoType]:
         if not self.account:
             raise AccountException(
                 "Account not selected. Please choose an account first.")
@@ -90,12 +68,31 @@ class Bitbucket():
             username=self.account.username,
             app_password=self.account.app_password,
         )
-        self.workspaces = ba.fetch_workspace_repos(self.workspace)
+        return ba.fetch_workspace_repos(workspace)
+
+    def _repos_to_file(self, repos: list[RepoType]) -> None:
+        if not self.account:
+            raise AccountException(
+                "Account not selected. Please choose an account first.")
+        file_name = f"{self.account.email}_repos.csv"
+        file_path = os.path.join(self.ROOT_DIR, file_name)
+        with open(file_path, "a") as f:
+            writer = csv.writer(f)
+            for repo in repos:
+                # Get the repo name from full name
+                repo_name = repo.name.split("/")[-1]
+                writer.writerow([repo_name, repo.workspace])
+        pretty_print(
+            f"Repositories saved to {file_path}"
+        )
+
+    def _delete_repo_file(self, file_path) -> None:
+        if not os.path.exists(file_path):
+            pretty_print(f"File {file_path} does not exist.", error=True)
+            return
+        os.remove(file_path)
 
     def list_repos(self) -> None:
-        """
-        Lists all repositories in the selected workspace.
-        """
         if not self.workspaces:
             pretty_print("No repositories found.", error=True)
             return
@@ -109,193 +106,6 @@ class Bitbucket():
             rows=table_rows,
         )
 
-    # def fetchWorkspaceRepos(self):
-    #     repos = []
-    #     url = (
-    #         f"https://api.bitbucket.org/2.0/repositories/{self.workspace}"
-    #         f"?pagelen=100&fields=next,values.links.branches.href,values.full_name"
-    #     )
-    #     count = 1
-    #     while url:
-    #         print(f"Fetching page {count}: {url}")
-    #         response = requests.get(url, auth=self.auth)
-    #         if response.status_code != 200:
-    #             pretty_print(
-    #                 f"Failed to fetch data: {response.status_code} {response.text}", error=True)
-    #             break
-    #         data = response.json()
-    #         values = data.get("values", [])
-    #         if not values:
-    #             pretty_print("No more repositories to fetch.", error=True)
-    #             break
-    #         # Optionally save the raw data
-    #         with open(f"data_page_{count}.json", "w") as f:
-    #             f.write(response.text)
-    #         for repo in values:
-    #             repos.append(repo["full_name"])
-    #         url = data.get("next")  # Get the next page URL
-    #         count += 1
-    #     # Optionally clean up
-    #     os.system("rm data_page_*.json")
-    #     self.repos = sorted(repos, key=lambda x: x.lower())
-    #
-    # def showRepos(self):
-    #     self.fetchWorkspaceRepos()
-    #     if not self.repos:
-    #         pretty_print(
-    #             "No repositories found in the workspace.", error=True)
-    #         return
-    #     pretty_print(
-    #         f"Found {len(self.repos)} repositories in workspace '{self.workspace}':")
-    #     agree = input(
-    #         "Choose a repo, press 'Enter' to select or 'q' to quit: ").strip().lower()
-    #     if agree == 'q':
-    #         pretty_print(
-    #             "Exiting without selecting a repository.", error=True)
-    #         return
-    #     data = fzf.prompt(self.repos)
-    #     if not data:
-    #         pretty_print("No repository selected.", error=True)
-    #         return
-    #     selected_repo = data[0]
-    #     pretty_print(f"Selected repository: {selected_repo}")
-    #
-    # def searchRepo(self):
-    #     search_term = input("Enter the search term for repositories: ").strip()
-    #     self.fetchWorkspaceRepos()
-    #     # check if search_term exists in self.repos as a substring
-    #     matching_repos = [
-    #         repo for repo in self.repos if search_term.lower() in repo.lower()]
-    #     if not matching_repos:
-    #         pretty_print(
-    #             f"No repositories found matching '{search_term}'", error=True)
-    #     else:
-    #         pretty_print(
-    #             f"Found {len(matching_repos)} repositories matching '{search_term}':")
-    #         for repo in matching_repos:
-    #             print(repo)
-    #
-    # def chooseWorkspaces(self):
-    #     url = "https://api.bitbucket.org/2.0/workspaces"
-    #     response = requests.get(url, auth=self.auth)
-    #     workspaces = []
-    #     agree = input(
-    #         "Do you want to choose a workspace? (y/n): ").strip().lower()
-    #     print(f"agree: {agree}")
-    #     if agree != 'y':
-    #         self.workspace = "blueline2025"
-    #         pretty_print(f"Using default workspace: {self.workspace}")
-    #         return
-    #     print(f'self.printInitData(): {self.printInitData()}')
-    #     print(f'response: {response}')
-    #     if response.ok:
-    #         data = response.json()
-    #         for item in data.get("values", []):
-    #             workspace = item['slug']
-    #             workspaces.append(workspace)
-    #         workspace = fzf.prompt(workspaces)
-    #         self.workspace = workspace[0]
-    #         pretty_print(f"Selected workspace: {self.workspace}")
-    #     else:
-    #         pretty_print(response.text, error=True)
-    #         print(response.text)
-    #         exit()
-    #
-    # def checkRemoteRepo(self):
-    #     url = f"https://api.bitbucket.org/2.0/repositories/{self.old_workspace}/{self.repo_name}"
-    #     response = requests.get(url, auth=self.auth)
-    #     if response.status_code == 200:
-    #         print(f"[green]✅ Repository '{self.repo_name}' exists on the old account.")
-    #         self.is_in_old_account = True
-    #         return True
-    #     elif response.status_code == 404:
-    #         print(f"[red]❌ Repository '{self.repo_name}' does not exist on the old account.")
-    #         return False
-    #     else:
-    #         print(f"[red]❌ Failed to check repository. Status code: {response.status_code}")
-    #         print(response.json())
-    #         return False
-    #
-    # def checkRepoOnNewAccount(self):
-    #     print(f'self.repo_name: {self.repo_name}')
-    #     url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}/{self.repo_name}"
-    #     response = requests.get(url, auth=HTTPBasicAuth(self.new_username, self.new_app_password))
-    #     if response.status_code == 200:
-    #         print(f"[green]✅ Repository '{self.repo_name}' exists on the new account.")
-    #         self.is_in_new_account = True
-    #         return True
-    #     elif response.status_code == 404:
-    #         print(f"[red]❌ Repository '{self.repo_name}' does not exist on the new account.")
-    #         return False
-    #     else:
-    #         print(f"[red]❌ Failed to check repository. Status code: {response.status_code}")
-    #         print(response.json())
-    #         return False
-    #
-    # def checkConfig(self):
-    #     if not os.path.exists(f"{self.ROOT_DIR}/newRepoData.py") or not os.path.exists(f"{self.ROOT_DIR}/oldRepoData.py"):
-    #         print("Please ensure that newRepoData.py and oldRepoData.py are present in the same directory as this script.")
-    #         exit()
-    #
-    # def setRepoName(self):
-    #     self.repo_name = input("Enter the repository slug: ")
-    #
-    # def createRepo(self):
-    #     url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}/{self.repo_name}"
-    #     payload = {
-    #         "scm": "git",
-    #         "is_private": self.new_is_private,
-    #         "project": {"key": self.new_project_key},
-    #         "name": self.repo_name
-    #     }
-    #     return requests.post(url, json=payload, auth=HTTPBasicAuth(self.new_username, self.new_app_password))
-    #
-    # def newRepo(self):
-    #     if self.is_in_new_account:
-    #         print("[green]✅ Repository already exists on the new account. No need to create a new one.")
-    #         return
-    #
-    #     new_repo = self.createRepo()
-    #     if new_repo.status_code in (200, 201):
-    #         print(f"[green]✅ Repository '{self.repo_name}' created successfully!")
-    #         self.is_in_new_account = True
-    #         self.openPermissionsInBrowser()
-    #     else:
-    #         print(f"[red]❌ Failed to create repository. Status code: {new_repo.status_code}")
-    #         print(new_repo.json())
-    #
-    # def checkForNewRepo(self):
-    #     repo_url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}/{self.repo_name}"
-    #     response = requests.get(repo_url, auth=HTTPBasicAuth(self.new_username, self.new_app_password))
-    #     if response.status_code == 200:
-    #         print(f"[green]✅ Repository '{self.repo_name}' exists on the new account.")
-    #         self.is_in_new_account = True
-    #         return True
-    #     elif response.status_code == 404:
-    #         print(f"[red]❌ Repository '{self.repo_name}' does not exist on the new account.")
-    #         return False
-    #     else:
-    #         print(f"[red]❌ Failed to check repository. Status code: {response.status_code}")
-    #         print(response.json())
-    #         return False
-    #
-    # def copyOldRepoToNew(self):
-    #     if not self.is_in_old_account:
-    #         print("[red]❌ Repository does not exist on the old account. Cannot create new repository.")
-    #         return
-    #
-    #     response = self.createRepo()
-    #     if response.status_code in (200, 201):
-    #         print(f"✅ Repository '{self.repo_name}' created successfully!")
-    #         self.is_in_new_account = True
-    #         self.cloneOldRepo()
-    #         self.openPermissionsInBrowser()
-    #         self.pushNewRepo()
-    #         self.deleteRepo()
-    #     else:
-    #         print(f"❌ Failed to create repository. Status code: {response.status_code}")
-    #         print(response.json())
-    #
     # def openPermissionsInBrowser(self):
     #     if not self.is_in_new_account:
     #         print("[red]❌ Repository does not exist on the new account. Cannot open permissions in browser.")
@@ -303,16 +113,6 @@ class Bitbucket():
     #     url = f"https://bitbucket.org/{self.new_workspace}/{self.repo_name}/admin/access"
     #     print(f"Opening permissions page for {self.repo_name} in browser...")
     #     os.system(f"google-chrome-stable {url}")
-    #
-    # def cloneOldRepo(self):
-    #     if not self.is_in_old_account:
-    #         print("[red]❌ Repository does not exist on the old account. Cannot clone repository.")
-    #         return
-    #     repo_url = f"git clone --mirror git@bitbucket.org:sites-bludelego/{self.repo_name}.git";
-    #     # go to downloads
-    #     os.chdir(os.path.expanduser("~/Downloads"))
-    #     # clone the old repo
-    #     os.system(repo_url)
     #
     # def cloneNewRepo(self):
     #     repo_url = f"git clone git@bitbucket.org:blueline2025/{self.repo_name}.git"
@@ -336,54 +136,3 @@ class Bitbucket():
     #         return
     #     os.system(push_command)
     #
-    # def deleteRepo(self):
-    #     url = f"https://api.bitbucket.org/2.0/repositories/{self.old_workspace}/{self.repo_name}"
-    #     try:
-    #         response = requests.delete(url, auth=HTTPBasicAuth(self.old_username, self.old_app_password))
-    #         if response.status_code == 204:
-    #             print(f"✅ Repository '{self.repo_name}' deleted successfully!")
-    #     except requests.exceptions.RequestException as e:
-    #         print(f"[red]❌ An error occurred while trying to delete the repository: {e}")
-    #
-    # def listRepos(self):
-    #     self.new_workspace = "blueline2025"
-    #     url = f"https://api.bitbucket.org/2.0/repositories/{self.new_workspace}"
-    #     try:
-    #         repos = []
-    #         while url:
-    #             response = requests.get(url, auth=HTTPBasicAuth(self.new_username, self.new_username))
-    #             if response.status_code == 200:
-    #                 data = response.json()
-    #                 for repo in data.get("values", []):
-    #                     repos.append(repo["name"])
-    #                 url = data.get("next")  # Pagination support
-    #             else:
-    #                 print(f"[red]❌ Failed to fetch repositories: {response.status_code} {response.text}")
-    #                 break
-    #         print(f"✅ Found {len(repos)} repositories:")
-    #         for repo_name in repos:
-    #             print(f" - {repo_name}")
-    #         return repos
-    #     except requests.exceptions.RequestException as e:
-    #         print(f"[red]❌ An error occurred while trying to list repositories: {e}")
-    #         return []
-    #
-    #
-    # def list_projects(self, workspace, old=False):
-    #     if old:
-    #         print("\033[92mListing old projects...\033[0m")  # green text
-    #         username = self.old_username
-    #         app_password = self.old_app_password
-    #     else:
-    #         username = self.new_username
-    #         app_password = self.new_app_password
-    #     print(f"\033[92mListing projects in workspace '{workspace}'...\033[0m")  # green text
-    #     url = f"https://api.bitbucket.org/2.0/workspaces/{workspace}/projects"
-    #     response = requests.get(url, auth=HTTPBasicAuth(username, app_password))
-    #     print(f"HTTP STATUS: {response.status_code}")
-    #     if response.ok:
-    #         data = response.json()
-    #         print(json.dumps(data, indent=2))
-    #     else:
-    #         print("Failed to list projects.")
-    #         print(response.text)
