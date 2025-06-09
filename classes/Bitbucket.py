@@ -14,13 +14,13 @@ fzf = FzfPrompt()
 
 
 class Bitbucket():
-    def __init__(self, email):
+    def __init__(self):
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)
-        self.email = email
         self.workspaces: list[str] = []
         self.workspace: str | None = None
         self.account: AccountType | None = None
+        self.email: str | None = None
         # self.auth = HTTPBasicAuth(self.username, self.app_password)
 
     def init_repo_data(self) -> None:
@@ -49,6 +49,7 @@ class Bitbucket():
     def _choose_account_by_email(self):
         ac = AccountsCsv()
         self.account = ac.choose_account_by_email()
+        self.email = self.account.email
 
     def _get_workspaces_from_api(self) -> list[str]:
         if not self.account:
@@ -105,6 +106,7 @@ class Bitbucket():
             columns=table_columns,
             rows=table_rows,
         )
+
 
     # def openPermissionsInBrowser(self):
     #     if not self.is_in_new_account:
