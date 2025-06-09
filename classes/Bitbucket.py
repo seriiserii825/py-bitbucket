@@ -88,11 +88,11 @@ class Bitbucket():
             return
         os.remove(file_path)
 
-    def find_repo_from_file(self):
+    def get_repo_from_file(self) -> str:
         repos = self._get_repos_from_file()
-        repos_for_fzf = [f"{repo.name} ({repo.workspace})" for repo in repos]
+        repos_for_fzf = [f"{repo.name}/{repo.workspace}" for repo in repos]
         selected_repo = fzf.prompt(repos_for_fzf)
-        print(f"selected_repo: {selected_repo[0]}")
+        return selected_repo[0]
 
     def _get_repos_from_file(self) -> list[RepoType]:
         account = self._choose_account_by_email()

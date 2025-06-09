@@ -2,8 +2,8 @@ import os
 import subprocess
 import webbrowser
 
+from classes.Bitbucket import Bitbucket
 from classes.Browser import Browser
-from libs.select import selectOne
 
 
 def git_mirror():
@@ -18,20 +18,13 @@ def git_mirror():
 
 
 def clone_mirror_from_bitbucket():
-    repo_name = _get_repo_name()
-    workspaces = ["blueline2025", "sites-bludelego", "seriiserii825"]
-    workspace = selectOne(workspaces)
+    bb = Bitbucket()
+    repo = bb.get_repo_from_file()
+    repo_name = repo.split("/")[0]
+    workspace = repo.split("/")[1]
     _clone_repo(repo_name, workspace)
     _cd_cloned_repo(repo_name)
     return (repo_name, workspace)
-
-
-def _get_repo_name() -> str:
-    repo_name = input("Enter repo_name: ")
-    if not repo_name:
-        print("Repository name cannot be empty.")
-        exit(1)
-    return repo_name
 
 
 def _clone_repo(repo_name: str, workspace: str):

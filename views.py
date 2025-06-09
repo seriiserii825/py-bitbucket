@@ -13,7 +13,7 @@ def repos_to_file():
 def find_repo_in_file():
     bb = Bitbucket()
     try:
-        bb.find_repo_from_file()
+        bb.get_repo_from_file()
     except BitbucketException as e:
         print(f"[red]Error: {e}[/red]")
 
