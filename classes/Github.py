@@ -1,14 +1,18 @@
 import os
 import requests
 import subprocess
+import csv
+from github import Github
+
 from dotenv import load_dotenv
 from pathlib import Path
+
 
 from execeptions.GithubException import GithubException
 from modules.git_mirror import clone_mirror_from_bitbucket
 
 
-class Github:
+class GithubClass:
     def __init__(self):
         self.repo_http = "https://github.com/seriiserii825"
         self.repo_name = ""
@@ -194,3 +198,35 @@ class Github:
         except subprocess.CalledProcessError as e:
             print(f"Error setting new origin URL: {e}")
             exit(1)
+
+    def export_github_repos_to_csv(self, github_token: str, username: str, output_file='github_repos.csv'):
+        g = Github(github_token)
+
+        try:
+            user = g.get_user(username)
+            repos = user.get_repos()
+
+            with open(output_file, mode='w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow(["Name", "Full Name", "Private", "URL", "Description",
+                                "Created At", "Updated At", "Language", "Forks", "Stars", "Archived"])
+
+                for repo in repos:
+                    writer.writerow([
+                        repo.name,
+                        repo.full_name,
+                        repo.private,
+                        repo.html_url,
+                        repo.description or "",
+                        repo.created_at,
+                        repo.updated_at,
+                        repo.language,
+                        repo.forks_count,
+                        repo.stargazers_count,
+                        repo.archived,
+                    ])
+
+            print(f"✅ Exported {repos.totalCount} repos to {output_file}")
+
+        except Exception as e:
+            print(f"❌ Error: {e}")
