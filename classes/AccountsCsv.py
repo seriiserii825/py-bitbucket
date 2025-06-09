@@ -24,15 +24,13 @@ class AccountsCsv:
         with open(self.file_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                row["is_private"] = row["is_private"].lower() == "True"
-                is_private = row.get("is_private", "").strip().lower() == "true"
                 account = AccountType(
                     email=row["email"],
                     workspace=row["workspace"],
                     project_key=row["project_key"],
                     username=row["username"],
                     app_password=row["app_password"],
-                    is_private=is_private,
+                    is_private=row["is_private"],
                 )
                 rows.append(account)
         return rows

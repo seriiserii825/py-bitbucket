@@ -7,4 +7,4 @@ class AccountType(NamedTuple):
     project_key: str
     username: str
     app_password: str
-    is_private: bool
+    is_private: str
