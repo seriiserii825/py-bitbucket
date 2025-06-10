@@ -30,6 +30,12 @@ def create_new_repo_in_bitbucket():
     except BitbucketException as e:
         pretty_print(f"Error: {e}", error=True)
 
+def clone_from_bitbucket():
+    bb = Bitbucket()
+    try:
+        bb.clone_from_bitbucket()
+    except BitbucketException as e:
+        pretty_print(f"Error: {e}", error=True)
 
 def clone_from_github():
     gth = GithubClass()

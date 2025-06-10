@@ -1,7 +1,7 @@
 from rich import print
 from modules.git_mirror import git_mirror
 from utils import pretty_table
-from views import clone_from_github, create_repo_on_github, delete_repos_on_github
+from views import clone_from_bitbucket, clone_from_github, create_repo_on_github, delete_repos_on_github
 from views import delete_reop_on_github
 from views import export_github_repos_to_csv, from_bitbucket_to_github
 from views import create_new_repo_in_bitbucket, find_repo_in_file, repos_to_file
@@ -15,12 +15,13 @@ def menu():
         ["2", "[blue]Bitbucket repos to File"],
         ["3", "[blue]Find Repo in bitbucket File"],
         ["4", "[blue]Create new repo on bitbucket"],
-        ["5", "[green]Clone from github"],
-        ["6", "[green]Create repo on github"],
-        ["7", "[red]Delete repo on github"],
-        ["8", "[red]Delete mutliple repos on github"],
-        ["9", "[green]From bitbucket to github"],
-        ["10", "[green]From github to csv"]
+        ["5", "[blue]Clone repo on bitbucket"],
+        ["6", "[green]Clone from github"],
+        ["7", "[green]Create repo on github"],
+        ["8", "[red]Delete repo on github"],
+        ["9", "[red]Delete mutliple repos on github"],
+        ["10", "[green]From bitbucket to github"],
+        ["11", "[green]From github to csv"]
     ]
     pretty_table(table_header, table_columns, table_rows)
 
@@ -37,16 +38,18 @@ def menu():
         create_new_repo_in_bitbucket()
         menu()
     elif choice == "5":
-        clone_from_github()
+        clone_from_bitbucket()
     elif choice == "6":
+        clone_from_github()
+    elif choice == "7":
         create_repo_on_github()
-    elif choice == "7":
+    elif choice == "8":
         delete_reop_on_github()
-    elif choice == "7":
-        delete_repos_on_github()
     elif choice == "9":
-        from_bitbucket_to_github()
+        delete_repos_on_github()
     elif choice == "10":
+        from_bitbucket_to_github()
+    elif choice == "11":
         export_github_repos_to_csv()
     else:
         print("[red]Invalid choice! Please try again.")
