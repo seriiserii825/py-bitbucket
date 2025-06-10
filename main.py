@@ -1,11 +1,11 @@
 from rich import print
 from modules.git_mirror import git_mirror
 from utils import pretty_table
-from views import clone_from_bitbucket, clone_from_github
+from views import clone_from_bitbucket, clone_from_github, find_repo_in_bitbucket_file
 from views import create_repo_on_github, delete_repos_on_github
 from views import delete_reop_on_github, set_origin_url_bitbucket
 from views import export_github_repos_to_csv, from_bitbucket_to_github
-from views import create_new_repo_in_bitbucket, find_repo_in_file, repos_to_file
+from views import create_new_repo_in_bitbucket, repos_to_file
 
 
 def menu():
@@ -34,7 +34,7 @@ def menu():
         repos_to_file()
         menu()
     elif choice == "3":
-        find_repo_in_file()
+        find_repo_in_bitbucket_file()
         menu()
     elif choice == "4":
         create_new_repo_in_bitbucket()

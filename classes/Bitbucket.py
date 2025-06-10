@@ -10,7 +10,7 @@ from pyfzf.pyfzf import FzfPrompt
 from execeptions.BitbucketException import BitbucketException
 from my_types.account_type import AccountType
 from my_types.repo_type import RepoType
-from utils import pretty_print
+from utils import pretty_print, selectOne
 
 
 fzf = FzfPrompt()
@@ -63,6 +63,7 @@ class Bitbucket():
         ac.print_account_values_by_email(email)
 
     def _choose_account_by_email(self) -> AccountType:
+        print("Choose an account by email:")
         return self._get_account_from_file()
 
     def set_new_origin(self) -> None:
@@ -137,7 +138,15 @@ class Bitbucket():
         selected_repo = fzf.prompt(repos_for_fzf)
         return selected_repo[0]
 
+    def check_repo_and_workspace_in_file(self, repo_name, workspace) -> bool:
+        repos = self._get_repos_from_file()
+        return any(
+            repo.name == repo_name and repo.workspace == workspace
+            for repo in repos
+        )
+
     def _get_repos_from_file(self) -> List[RepoType]:
+        print("Choose an account by email, to search in file:")
         account = self._choose_account_by_email()
         file_name = f"{account.email}_repos.csv"
         file_path = os.path.join(self.ROOT_DIR, file_name)
@@ -157,19 +166,28 @@ class Bitbucket():
         workspaces = self._get_workspaces_from_file()
         if not workspaces:
             raise BitbucketException("No workspaces found.")
-        workspace = fzf.prompt(workspaces)
+        print("Select a workspace:")
+        workspace = selectOne(workspaces)
         return workspace
 
     def new_repo(self):
-        account = self._choose_account_by_email()
-        bb_api = BitbucketApi(account.username, account.app_password)
         repo_name = input("Enter the new repository name: ")
         if not repo_name:
             raise BitbucketException("Repository name cannot be empty.")
 
+        workspace = self.select_workspace()
+        if not self.check_repo_and_workspace_in_file(repo_name, workspace):
+            raise BitbucketException(
+                f"Repository '{repo_name}' already exists in workspace '{workspace}'."
+            )
+
+        account = self._choose_account_by_email()
+        bb_api = BitbucketApi(account.username, account.app_password)
+        project_key = account.project_key
+
         new_repo = bb_api._createRepoOnBitbucketApi(
-            workspace=self.workspace,
-            project_key=self.workspace,
+            workspace=workspace,
+            project_key=project_key,
             repo_name=repo_name
         )
         if new_repo.status_code in (200, 201):

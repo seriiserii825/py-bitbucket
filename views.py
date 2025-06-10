@@ -11,7 +11,7 @@ def repos_to_file():
     bb.repos_to_file()
 
 
-def find_repo_in_file():
+def find_repo_in_bitbucket_file():
     bb = Bitbucket()
     try:
         bb.get_repo_from_file()
