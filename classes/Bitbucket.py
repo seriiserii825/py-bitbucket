@@ -236,3 +236,10 @@ class Bitbucket():
                 f"Failed to create repository '{repo_name}'. "
                 f"Status code: {new_repo.status_code}"
             )
+
+    def set_repo_name(self) -> str:
+        pretty_print('Please enter the new repository name:')
+        repo_name = input("Enter the new repository name: ")
+        if not repo_name:
+            raise BitbucketException("Repository name cannot be empty.")
+        return repo_name

@@ -1,4 +1,5 @@
 from rich import print
+from classes.BitbucketCreateRepo import BitbucketCreateRepo
 from classes.BitbucketFindRepoInFile import BitbucketFindRepoInFile
 from classes.BitbucketMirror import BitbucketMirror
 from classes.BitbucketReposToFile import BitbucketReposToFile
@@ -43,7 +44,8 @@ def menu():
         bb.start()
         menu()
     elif choice == "4":
-        create_new_repo_in_bitbucket()
+        bb = BitbucketCreateRepo()
+        bb.start()
         menu()
     elif choice == "5":
         clone_from_bitbucket()
