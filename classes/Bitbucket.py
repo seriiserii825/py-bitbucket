@@ -1,5 +1,6 @@
 import csv
 import os
+import subprocess
 from typing import List
 from classes.AccountsCsv import AccountsCsv
 from classes.BitbucketApi import BitbucketApi
@@ -63,6 +64,35 @@ class Bitbucket():
 
     def _choose_account_by_email(self) -> AccountType:
         return self._get_account_from_file()
+
+    def set_new_origin(self) -> None:
+        repo_from_file = self.get_repo_from_file()
+        repo_name = repo_from_file.split("/")[0]
+        workspace = repo_from_file.split("/")[1]
+        remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
+        set_url_cmd = ["git", "remote", "set-url", "origin", remote_url]
+        try:
+            subprocess.run(set_url_cmd, check=True)
+        except subprocess.CalledProcessError as e:
+            raise BitbucketException(
+                f"Failed to set new origin URL: {e}"
+            ) from e
+        try:
+            self._push_origin_force(workspace, repo_name)
+        except BitbucketException as e:
+            raise BitbucketException(
+                f"Failed to push to origin after setting new URL: {e}"
+            ) from e
+
+    def _push_origin_force(self, workspace: str, repo_name: str) -> None:
+        remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
+        push_cmd = ["git", "push -u",  "origin main", "--force", remote_url]
+        try:
+            subprocess.run(push_cmd, check=True, shell=True)
+        except subprocess.CalledProcessError as e:
+            raise BitbucketException(
+                f"Failed to push to origin: {e}"
+            ) from e
 
     def _get_account_from_file(self) -> AccountType:
         ac = AccountsCsv()

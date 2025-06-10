@@ -30,12 +30,22 @@ def create_new_repo_in_bitbucket():
     except BitbucketException as e:
         pretty_print(f"Error: {e}", error=True)
 
+
+def set_origin_url_bitbucket():
+    bb = Bitbucket()
+    try:
+        bb.set_new_origin()
+    except BitbucketException as e:
+        pretty_print(f"Error: {e}", error=True)
+
+
 def clone_from_bitbucket():
     bb = Bitbucket()
     try:
         bb.clone_from_bitbucket()
     except BitbucketException as e:
         pretty_print(f"Error: {e}", error=True)
+
 
 def clone_from_github():
     gth = GithubClass()
@@ -59,6 +69,7 @@ def delete_reop_on_github():
         gth.delete_repo()
     except GithubException as e:
         pretty_print(f"Error: {e}", error=True)
+
 
 def delete_repos_on_github():
     gth = GithubClass()

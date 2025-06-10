@@ -1,8 +1,9 @@
 from rich import print
 from modules.git_mirror import git_mirror
 from utils import pretty_table
-from views import clone_from_bitbucket, clone_from_github, create_repo_on_github, delete_repos_on_github
-from views import delete_reop_on_github
+from views import clone_from_bitbucket, clone_from_github
+from views import create_repo_on_github, delete_repos_on_github
+from views import delete_reop_on_github, set_origin_url_bitbucket
 from views import export_github_repos_to_csv, from_bitbucket_to_github
 from views import create_new_repo_in_bitbucket, find_repo_in_file, repos_to_file
 
@@ -16,12 +17,13 @@ def menu():
         ["3", "[blue]Find Repo in bitbucket File"],
         ["4", "[blue]Create new repo on bitbucket"],
         ["5", "[blue]Clone repo on bitbucket"],
-        ["6", "[green]Clone from github"],
-        ["7", "[green]Create repo on github"],
-        ["8", "[red]Delete repo on github"],
-        ["9", "[red]Delete mutliple repos on github"],
-        ["10", "[green]From bitbucket to github"],
-        ["11", "[green]From github to csv"]
+        ["6", "[blue]Set and push new origin bitbucket"],
+        ["7", "[green]Clone from github"],
+        ["8", "[green]Create repo on github"],
+        ["9", "[red]Delete repo on github"],
+        ["10", "[red]Delete mutliple repos on github"],
+        ["11", "[green]From bitbucket to github"],
+        ["12", "[green]From github to csv"]
     ]
     pretty_table(table_header, table_columns, table_rows)
 
@@ -40,16 +42,18 @@ def menu():
     elif choice == "5":
         clone_from_bitbucket()
     elif choice == "6":
-        clone_from_github()
+        set_origin_url_bitbucket()
     elif choice == "7":
-        create_repo_on_github()
+        clone_from_github()
     elif choice == "8":
-        delete_reop_on_github()
+        create_repo_on_github()
     elif choice == "9":
-        delete_repos_on_github()
+        delete_reop_on_github()
     elif choice == "10":
-        from_bitbucket_to_github()
+        delete_repos_on_github()
     elif choice == "11":
+        from_bitbucket_to_github()
+    elif choice == "12":
         export_github_repos_to_csv()
     else:
         print("[red]Invalid choice! Please try again.")
