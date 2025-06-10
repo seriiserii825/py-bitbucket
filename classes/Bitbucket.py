@@ -11,7 +11,7 @@ from execeptions.BitbucketException import BitbucketException
 from my_types import repo_type
 from my_types.account_type import AccountType
 from my_types.repo_type import RepoType
-from utils import pretty_print, selectOne
+from utils import pretty_print, pretty_table, selectOne
 
 
 fzf = FzfPrompt()
@@ -158,6 +158,21 @@ class Bitbucket():
             name=selected_repo[0].split("/")[0],
             workspace=selected_repo[0].split("/")[1]
         )
+
+    def find_repo_in_file(self):
+        repo_name = input("Enter the repository name to search: ")
+        if not repo_name:
+            raise BitbucketException("Repository name cannot be empty.")
+        repos = self._get_repos_from_file()
+        finded_repos = [repo for repo in repos if repo_name in repo.name]
+        if finded_repos:
+            table_title = "Repos"
+            table_columns = ["Name", "Workspace"]
+            table_rows = [[repo.name, repo.workspace] for repo in finded_repos]
+            pretty_table(table_title, table_columns, table_rows)
+        else:
+            raise BitbucketException(
+                f"Repository '{repo_name}' not found in file.")
 
     def check_repo_and_workspace_in_file(self, repo_name, workspace) -> bool:
         repos = self._get_repos_from_file()

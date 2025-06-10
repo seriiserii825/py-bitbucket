@@ -1,13 +1,13 @@
 from rich import print
+from classes.BitbucketFindRepoInFile import BitbucketFindRepoInFile
 from classes.BitbucketMirror import BitbucketMirror
 from classes.BitbucketReposToFile import BitbucketReposToFile
-from modules.git_mirror import git_mirror
 from utils import pretty_table
-from views import clone_from_bitbucket, clone_from_github, find_repo_in_bitbucket_file
+from views import clone_from_bitbucket, clone_from_github
 from views import create_repo_on_github, delete_repos_on_github
 from views import delete_reop_on_github, set_origin_url_bitbucket
 from views import export_github_repos_to_csv, from_bitbucket_to_github
-from views import create_new_repo_in_bitbucket, repos_to_file
+from views import create_new_repo_in_bitbucket
 
 
 def menu():
@@ -25,7 +25,8 @@ def menu():
         ["9", "[red]Delete repo on github"],
         ["10", "[red]Delete mutliple repos on github"],
         ["11", "[green]From bitbucket to github"],
-        ["12", "[green]From github to csv"]
+        ["12", "[green]From github to csv"],
+        ["13", "[red]Exit"]
     ]
     pretty_table(table_header, table_columns, table_rows)
 
@@ -38,7 +39,8 @@ def menu():
         bm = BitbucketMirror()
         bm.start()
     elif choice == "3":
-        find_repo_in_bitbucket_file()
+        bb = BitbucketFindRepoInFile()
+        bb.start()
         menu()
     elif choice == "4":
         create_new_repo_in_bitbucket()
@@ -60,8 +62,8 @@ def menu():
     elif choice == "12":
         export_github_repos_to_csv()
     else:
-        print("[red]Invalid choice! Please try again.")
-        menu()
+        print("[red]Exiting the program...")
+        exit(0)
 
 
 if __name__ == "__main__":
