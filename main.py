@@ -1,5 +1,6 @@
 from rich import print
 from classes.BitbucketMirror import BitbucketMirror
+from classes.BitbucketReposToFile import BitbucketReposToFile
 from modules.git_mirror import git_mirror
 from utils import pretty_table
 from views import clone_from_bitbucket, clone_from_github, find_repo_in_bitbucket_file
@@ -13,8 +14,8 @@ def menu():
     table_header = "Choose an option"
     table_columns = ["Index", "Option"]
     table_rows = [
-        ["1", "[blue]Clone and Mirror Bitbucket Repo to Bitbucket"],
-        ["2", "[blue]Bitbucket repos to File"],
+        ["1", "[blue]Bitbucket repos to File"],
+        ["2", "[blue]Clone and Mirror Bitbucket Repo to Bitbucket"],
         ["3", "[blue]Find Repo in bitbucket File"],
         ["4", "[blue]Create new repo on bitbucket"],
         ["5", "[blue]Clone repo on bitbucket"],
@@ -29,12 +30,13 @@ def menu():
     pretty_table(table_header, table_columns, table_rows)
 
     choice = input("Enter your choice: ")
-    if choice == "1":
+    if choice == "2":
+        bb = BitbucketReposToFile()
+        bb.start()
+        menu()
+    elif choice == "2":
         bm = BitbucketMirror()
         bm.start()
-    elif choice == "2":
-        repos_to_file()
-        menu()
     elif choice == "3":
         find_repo_in_bitbucket_file()
         menu()
