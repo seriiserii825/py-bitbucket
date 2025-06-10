@@ -37,7 +37,6 @@ class AccountsCsv:
 
     def get_account_by_email(self, email) -> AccountType:
         accounts = self._from_file_to_array()
-        print(f"accounts: {accounts}")
         for account in accounts:
             if account.email == email:
                 return account
@@ -59,7 +58,7 @@ class AccountsCsv:
         if account:
             pretty_table(table_title, table_headers, [table_rows])
         else:
-            print("Account not found.")
+            raise AccountException(f"Account with email {email} not found.")
 
     def _get_all_emails(self) -> List[str]:
         accounts = self._from_file_to_array()

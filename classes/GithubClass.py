@@ -5,12 +5,11 @@ import csv
 from github import Github
 from dotenv import load_dotenv
 from pathlib import Path
-from pyfzf.pyfzf import FzfPrompt
 from rich import print
-
-
 from execeptions.GithubException import GithubException
 from modules.git_mirror import clone_mirror_from_bitbucket
+from utils import selectMultiple
+from pyfzf.pyfzf import FzfPrompt
 
 
 fzf = FzfPrompt()
@@ -142,13 +141,31 @@ class GithubClass:
         except subprocess.CalledProcessError as e:
             print("❌ Git command failed:", e)
 
-    def delete_repo(self):
+    def delete_repos(self):
+        repos = self._get_repos_from_file()
+        if not repos:
+            raise GithubException("No repositories found in the file.")
+
+        selected_repos = selectMultiple(repos)
+        if not selected_repos:
+            raise GithubException("No repositories selected for deletion.")
+
+        for repo_name in selected_repos:
+            try:
+                self.delete_repo(repo_name)
+            except GithubException as e:
+                raise GithubException(
+                    f"Failed to delete repository '{repo_name}': {e}")
+
+    def delete_repo(self, repo_name_arg: str = ''):
         token = self._get_data_from_env("GITHUB_TOKEN")
         username = self._get_data_from_env("GITHUB_USERNAME")
-        repo_name = input("Enter the repository name to delete: ")
-        if not repo_name:
-            print("❌ Repository name cannot be empty.")
-            return
+        if not repo_name_arg:
+            repos = self._get_repos_from_file()
+            repo_name = fzf.prompt(repos)
+        else:
+            repo_name = repo_name_arg
+
         url = f"https://api.github.com/repos/{username}/{repo_name}"
         headers = {
             "Accept": "application/vnd.github.v3+json",
@@ -164,7 +181,8 @@ class GithubClass:
                 "Repository not found or insufficient permissions.")
         else:
             raise GithubException(
-                f"Failed to delete repository: {response.status_code} - {response.json().get('message', 'Unknown error')}")
+                f"Failed to delete repository: {response.status_code} \
+                - {response.json().get('message', 'Unknown error')}")
 
     def _get_data_from_env(self, key: str) -> str:
         current_script_path = Path(__file__).resolve()
@@ -242,7 +260,7 @@ class GithubClass:
         repos = self._get_repos_from_file()
         if not repos:
             raise GithubException("No repositories found in the file.")
-        return fzf.select(repos)
+        return fzf.prompt(repos)
 
     def check_repo_on_github(self, repo_name: str) -> bool:
         repos = self._get_repos_from_file()

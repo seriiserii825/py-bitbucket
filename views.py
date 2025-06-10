@@ -54,6 +54,13 @@ def delete_reop_on_github():
     except GithubException as e:
         pretty_print(f"Error: {e}", error=True)
 
+def delete_repos_on_github():
+    gth = GithubClass()
+    try:
+        gth.delete_repos()
+    except GithubException as e:
+        pretty_print(f"Error: {e}", error=True)
+
 
 def from_bitbucket_to_github():
     gth = GithubClass()

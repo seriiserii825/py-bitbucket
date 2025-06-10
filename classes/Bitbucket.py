@@ -24,6 +24,17 @@ class Bitbucket():
         self.account: AccountType | None = None
         self.email: str | None = None
 
+    def clone_from_bitbucket(self):
+        repo = self.get_repo_from_file()
+        repo_name = repo.split("/")[0]
+        workspace = repo.split("/")[1]
+        self._clone_repo(repo_name, workspace)
+
+    def _clone_repo(self, repo_name: str, workspace: str):
+        command = f"git clone git@bitbucket.org:{workspace}/{repo_name}.git"
+        print(f"command: {command}")
+        os.system(command)
+
     def repos_to_file(self) -> None:
         account = self._choose_account_by_email()
         print(f"account: {account}")

@@ -1,10 +1,11 @@
+from typing import List
 from simple_term_menu import TerminalMenu
 from rich.console import Console
 from rich.table import Table
 from rich import print
 
 
-def selectOne(options: list[str]) -> str:
+def selectOne(options: List[str]) -> str:
     """
     Displays a terminal menu for selecting one option from a list.
     """
@@ -16,7 +17,7 @@ def selectOne(options: list[str]) -> str:
 # selectOne(getThemes())
 
 
-def selectMultiple(options: list[str]) -> list[str]:
+def selectMultiple(options: List[str]) -> List[str]:
     """
     Displays a terminal menu for selecting multiple options from a list.
     """
@@ -46,7 +47,7 @@ def pretty_print(value, error=False):
         print("[green]===============================")
 
 
-def pretty_table(title: str, columns: list[str], rows: list[list[str]]):
+def pretty_table(title: str, columns: List[str], rows: List[List[str]]):
     table = Table(title=title)
 
     for column in columns:
