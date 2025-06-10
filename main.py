@@ -1,4 +1,5 @@
 from rich import print
+from classes.BitbucketMirror import BitbucketMirror
 from modules.git_mirror import git_mirror
 from utils import pretty_table
 from views import clone_from_bitbucket, clone_from_github, find_repo_in_bitbucket_file
@@ -29,7 +30,8 @@ def menu():
 
     choice = input("Enter your choice: ")
     if choice == "1":
-        git_mirror()
+        bm = BitbucketMirror()
+        bm.start()
     elif choice == "2":
         repos_to_file()
         menu()

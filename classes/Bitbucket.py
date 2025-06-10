@@ -8,6 +8,7 @@ from execeptions.AccountException import AccountException
 from pyfzf.pyfzf import FzfPrompt
 
 from execeptions.BitbucketException import BitbucketException
+from my_types import repo_type
 from my_types.account_type import AccountType
 from my_types.repo_type import RepoType
 from utils import pretty_print, selectOne
@@ -25,14 +26,12 @@ class Bitbucket():
         self.account: AccountType | None = None
         self.email: str | None = None
 
-    def clone_from_bitbucket(self):
-        repo = self.get_repo_from_file()
-        repo_name = repo.split("/")[0]
-        workspace = repo.split("/")[1]
-        self._clone_repo(repo_name, workspace)
-
-    def _clone_repo(self, repo_name: str, workspace: str):
-        command = f"git clone git@bitbucket.org:{workspace}/{repo_name}.git"
+    def clone_repo(self, repo_name: str, workspace: str, mirror: bool = False) -> None:
+        if mirror:
+            command = f"git clone --mirror \
+            git@bitbucket.org:{workspace}/{repo_name}.git"
+        else:
+            command = f"git clone git@bitbucket.org:{workspace}/{repo_name}.git"
         print(f"command: {command}")
         os.system(command)
 
@@ -63,29 +62,28 @@ class Bitbucket():
         ac.print_account_values_by_email(email)
 
     def _choose_account_by_email(self) -> AccountType:
-        print("Choose an account by email:")
         return self._get_account_from_file()
 
     def set_new_origin(self) -> None:
         repo_from_file = self.get_repo_from_file()
-        repo_name = repo_from_file.split("/")[0]
-        workspace = repo_from_file.split("/")[1]
-        remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
-        set_url_cmd = ["git", "remote", "set-url", "origin", remote_url]
-        try:
-            subprocess.run(set_url_cmd, check=True)
-        except subprocess.CalledProcessError as e:
-            raise BitbucketException(
-                f"Failed to set new origin URL: {e}"
-            ) from e
-        try:
-            self._push_origin_force(workspace, repo_name)
-        except BitbucketException as e:
-            raise BitbucketException(
-                f"Failed to push to origin after setting new URL: {e}"
-            ) from e
+        # repo_name = repo_from_file.split("/")[0]
+        # workspace = repo_from_file.split("/")[1]
+        # remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
+        # set_url_cmd = ["git", "remote", "set-url", "origin", remote_url]
+        # try:
+        #     subprocess.run(set_url_cmd, check=True)
+        # except subprocess.CalledProcessError as e:
+        #     raise BitbucketException(
+        #         f"Failed to set new origin URL: {e}"
+        #     ) from e
+        # try:
+        #     self.push_origin_force(workspace, repo_name)
+        # except BitbucketException as e:
+        #     raise BitbucketException(
+        #         f"Failed to push to origin after setting new URL: {e}"
+        #     ) from e
 
-    def _push_origin_force(self, workspace: str, repo_name: str) -> None:
+    def push_origin_force(self, workspace: str, repo_name: str) -> None:
         remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
         push_cmd = ["git", "push -u",  "origin main", "--force", remote_url]
         try:
@@ -94,6 +92,26 @@ class Bitbucket():
             raise BitbucketException(
                 f"Failed to push to origin: {e}"
             ) from e
+
+    def push_to_mirror_repo(self, repo_name: str, workspace: str) -> None:
+        repo_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
+        command = f"git push --mirror {repo_url}"
+        try:
+            subprocess.run(command, check=True, shell=True)
+        except Exception as e:
+            raise BitbucketException(
+                f"Error pushing to new repository: {e}"
+            )
+
+    def set_mirror_origin(self, repo_name: str, workspace: str) -> None:
+        remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
+        set_url_cmd = ["git", "remote", "set-url", "origin", remote_url]
+        try:
+            subprocess.run(set_url_cmd, check=True)
+        except subprocess.CalledProcessError:
+            raise BitbucketException(
+                f"Failed to set new origin URL: {set_url_cmd}"
+            )
 
     def _get_account_from_file(self) -> AccountType:
         ac = AccountsCsv()
@@ -132,11 +150,14 @@ class Bitbucket():
             return
         os.remove(file_path)
 
-    def get_repo_from_file(self) -> str:
+    def get_repo_from_file(self) -> RepoType:
         repos = self._get_repos_from_file()
         repos_for_fzf = [f"{repo.name}/{repo.workspace}" for repo in repos]
         selected_repo = fzf.prompt(repos_for_fzf)
-        return selected_repo[0]
+        return RepoType(
+            name=selected_repo[0].split("/")[0],
+            workspace=selected_repo[0].split("/")[1]
+        )
 
     def check_repo_and_workspace_in_file(self, repo_name, workspace) -> bool:
         repos = self._get_repos_from_file()
