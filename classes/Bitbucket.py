@@ -1,5 +1,6 @@
 import csv
 import os
+from typing import List
 from classes.AccountsCsv import AccountsCsv
 from classes.BitbucketApi import BitbucketApi
 from execeptions.AccountException import AccountException
@@ -15,10 +16,10 @@ fzf = FzfPrompt()
 
 
 class Bitbucket():
-    def __init__(self):
+    def __init__(self) -> None:
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)
-        self.workspaces: list[str] = []
+        self.workspaces: List[str] = []
         self.workspace: str | None = None
         self.account: AccountType | None = None
         self.email: str | None = None
@@ -41,7 +42,7 @@ class Bitbucket():
             writer.writerow(["Name", "Workspace"])
 
         for workspace in workspaces:
-            repos: list[RepoType] = self._get_repos_by_workspace(
+            repos: List[RepoType] = self._get_repos_by_workspace(
                 workspace, account)
             self._repos_to_file(repos, account)
 
@@ -56,21 +57,21 @@ class Bitbucket():
         ac = AccountsCsv()
         return ac.choose_account_by_email()
 
-    def _get_workspaces_from_api(self, account: AccountType) -> list[str]:
+    def _get_workspaces_from_api(self, account: AccountType) -> List[str]:
         ba = BitbucketApi(
             username=account.username,
             app_password=account.app_password,
         )
         return ba.fetch_workspace_list()
 
-    def _get_repos_by_workspace(self, workspace, account) -> list[RepoType]:
+    def _get_repos_by_workspace(self, workspace, account) -> List[RepoType]:
         ba = BitbucketApi(
             username=account.username,
             app_password=account.app_password,
         )
         return ba.fetch_workspace_repos(workspace)
 
-    def _repos_to_file(self, repos: list[RepoType], account) -> None:
+    def _repos_to_file(self, repos: List[RepoType], account) -> None:
         file_name = f"{account.email}_repos.csv"
         file_path = os.path.join(self.ROOT_DIR, file_name)
         with open(file_path, "a") as f:
@@ -95,7 +96,7 @@ class Bitbucket():
         selected_repo = fzf.prompt(repos_for_fzf)
         return selected_repo[0]
 
-    def _get_repos_from_file(self) -> list[RepoType]:
+    def _get_repos_from_file(self) -> List[RepoType]:
         account = self._choose_account_by_email()
         file_name = f"{account.email}_repos.csv"
         file_path = os.path.join(self.ROOT_DIR, file_name)
@@ -106,7 +107,7 @@ class Bitbucket():
                 repos.append(RepoType(name=row[0], workspace=row[1]))
         return repos
 
-    def _get_workspaces_from_file(self) -> list[str]:
+    def _get_workspaces_from_file(self) -> List[str]:
         repos = self._get_repos_from_file()
         workspaces = set(repo.workspace for repo in repos)
         return list(workspaces)
