@@ -3,13 +3,17 @@ import requests
 import subprocess
 import csv
 from github import Github
-
 from dotenv import load_dotenv
 from pathlib import Path
+from pyfzf.pyfzf import FzfPrompt
+from rich import print
 
 
 from execeptions.GithubException import GithubException
 from modules.git_mirror import clone_mirror_from_bitbucket
+
+
+fzf = FzfPrompt()
 
 
 class GithubClass:
@@ -18,6 +22,7 @@ class GithubClass:
         self.repo_name = ""
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)
+        self.file_path = os.path.join(self.ROOT_DIR, 'github_repos.csv')
 
     def setRepoName(self):
         self.repo_name = input("Enter the repository name: ")
@@ -58,20 +63,20 @@ class GithubClass:
             return True
         elif response.status_code == 404:
             print(
-                f"[red]❌ Repository '{self.repo_name}' does not exist on GitHub.")
+                f"❌ Repository '{self.repo_name}' does not exist on GitHub.")
             return False
         else:
             print(
-                f"[red]❌ Failed to check repository. Status code: {response.status_code}")
+                f"❌ Failed to check repository. Status code: {response.status_code}")
             return False
 
     def clone_repo(self):
         repo_name = input("Enter the repository name to clone: ")
         if not repo_name:
-            print("[red]❌ Repository name cannot be empty.")
+            print("❌ Repository name cannot be empty.")
             return
         if not self.checkRepo():
-            print("[red]❌ Cannot clone repository that does not exist.")
+            print("❌ Cannot clone repository that does not exist.")
             return
         clone_url = f"git@github.com:seriiserii825/{repo_name}.git"
 
@@ -80,7 +85,7 @@ class GithubClass:
             print(
                 f"[green]✅ Repository '{self.repo_name}' cloned successfully!")
         except subprocess.CalledProcessError as e:
-            print(f"[red]❌ Failed to clone repository: {e}")
+            print(f"❌ Failed to clone repository: {e}")
 
     def create_repo_from_folder(self):
         folder_name = os.path.basename(os.getcwd())
@@ -189,7 +194,7 @@ class GithubClass:
             print(f"✅ Successfully pushed mirror to GitHub: {repo_name}")
         except subprocess.CalledProcessError as e:
             raise GithubException(
-                f"[red]❌ Failed to push mirror to GitHub: {e}[/red]"
+                f"❌ Failed to push mirror to GitHub: {e}"
             )
 
     def _set_new_origin(self, repo_name: str, user_name: str):
@@ -202,8 +207,6 @@ class GithubClass:
             exit(1)
 
     def export_github_repos_to_csv(self):
-        output_file = 'github_repos.csv'
-        file_path = os.path.join(self.ROOT_DIR, output_file)
         github_token = self._get_data_from_env("GITHUB_TOKEN")
         username = self._get_data_from_env("GITHUB_USERNAME")
         g = Github(github_token)
@@ -212,7 +215,7 @@ class GithubClass:
             user = g.get_user(username)
             repos = user.get_repos()
 
-            with open(file_path, mode='w', newline='', encoding='utf-8') as file:
+            with open(self.file_path, mode='w', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
                 writer.writerow(["Name"])
 
@@ -221,7 +224,26 @@ class GithubClass:
                         repo.name,
                     ])
 
-            print(f"✅ Exported {repos.totalCount} repos to {output_file}")
-
         except Exception as e:
             print(f"❌ Error: {e}")
+
+    def _get_repos_from_file(self):
+        repos = []
+        with open(self.file_path, mode='r') as file:
+            reader = csv.reader(file)
+            next(reader)
+            for row in reader:
+                repos.append(row[0])
+        if not repos:
+            raise GithubException("No repositories found in the file.")
+        return repos
+
+    def _get_repo_from_file(self):
+        repos = self._get_repos_from_file()
+        if not repos:
+            raise GithubException("No repositories found in the file.")
+        return fzf.select(repos)
+
+    def check_repo_on_github(self, repo_name: str) -> bool:
+        repos = self._get_repos_from_file()
+        return repo_name in repos

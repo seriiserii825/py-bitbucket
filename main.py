@@ -1,7 +1,9 @@
 from rich import print
 from modules.git_mirror import git_mirror
 from utils import pretty_table
-from views import clone_from_github, create_repo_on_github, delete_reop_on_github, export_github_repos_to_csv, from_bitbucket_to_github
+from views import clone_from_github, create_repo_on_github
+from views import delete_reop_on_github
+from views import export_github_repos_to_csv, from_bitbucket_to_github
 from views import create_new_repo_in_bitbucket, find_repo_in_file, repos_to_file
 
 
@@ -44,7 +46,7 @@ def menu():
     elif choice == "9":
         export_github_repos_to_csv()
     else:
-        print("[red]Invalid choice! Please try again.[/red]")
+        print("[red]Invalid choice! Please try again.")
         menu()
 
 

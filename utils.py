@@ -1,6 +1,7 @@
 from simple_term_menu import TerminalMenu
 from rich.console import Console
 from rich.table import Table
+from rich import print
 
 
 def selectOne(options: list[str]) -> str:
@@ -37,12 +38,12 @@ def pretty_print(value, error=False):
     """
     if error:
         print("[red]===============================")
-        print(value)
+        print(f"[red]{value}")
         print("[red]===============================")
     else:
-        print("[blue]===============================")
-        print(value)
-        print("[blue]===============================")
+        print("[green]===============================")
+        print(f"[green]{value}")
+        print("[green]===============================")
 
 
 def pretty_table(title: str, columns: list[str], rows: list[list[str]]):
