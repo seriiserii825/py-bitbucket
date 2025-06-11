@@ -218,8 +218,8 @@ class Bitbucket():
             )
 
         account = self._choose_account_by_email()
-        bb_api = BitbucketApi(account.username, account.app_password)
         project_key = account.project_key
+        bb_api = BitbucketApi(account.username, account.app_password)
 
         new_repo = bb_api._createRepoOnBitbucketApi(
             workspace=workspace,

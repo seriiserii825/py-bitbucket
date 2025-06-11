@@ -67,3 +67,17 @@ class BitbucketApi:
             "name": repo_name
         }
         return requests.post(url, json=payload, auth=self.auth)
+
+    def delete_repo_on_bitbucket(self, repo_name, workspace):
+        pretty_print(f"Deleting repository: {repo_name} in workspace: {workspace}")
+        url = f"https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_name}"
+        try:
+            response = requests.delete(url, auth=self.auth)
+            print(f"response: {response}")
+            pretty_print("Repository deleted successfully.")
+        except requests.RequestException as e:
+            pretty_print(f"Request error: {e}", error=True)
+            raise BitbucketApiException(
+                f"Error deleting repository: {e}"
+            )
+        return response
