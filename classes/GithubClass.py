@@ -158,11 +158,13 @@ class GithubClass:
                     f"Failed to delete repository '{repo_name}': {e}")
 
     def delete_repo(self, repo_name_arg: str = ''):
+        pretty_print("Deleting a repository on GitHub...")
         token = self._get_data_from_env("GITHUB_TOKEN")
         username = self._get_data_from_env("GITHUB_USERNAME")
         if not repo_name_arg:
             repos = self._get_repos_from_file()
             repo_name = fzf.prompt(repos)
+            repo_name = repo_name[0]
         else:
             repo_name = repo_name_arg
 
@@ -170,9 +172,8 @@ class GithubClass:
         headers = {
             "Accept": "application/vnd.github.v3+json",
         }
-
-        response = requests.delete(url, auth=(
-            username, token), headers=headers)
+        pretty_print(f"url: {url}")
+        response = requests.delete(url, auth=(username, token), headers=headers)
 
         if response.status_code == 204:
             print(f"✅ Repository '{repo_name}' deleted successfully.")
