@@ -152,7 +152,8 @@ class Bitbucket():
 
     def get_repo_from_file(self) -> RepoType:
         repos = self._get_repos_from_file()
-        repos_for_fzf = [f"{repo.name}/{repo.workspace}" for repo in repos]
+        sorted_repos = sorted(repos, key=lambda x: (x.workspace, x.name))
+        repos_for_fzf = [f"{repo.name}/{repo.workspace}" for repo in sorted_repos]
         selected_repo = fzf.prompt(repos_for_fzf)
         return RepoType(
             name=selected_repo[0].split("/")[0],

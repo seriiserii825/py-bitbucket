@@ -1,4 +1,5 @@
 from rich import print
+from classes.BitbucketClone import BitbucketClone
 from classes.BitbucketCreateRepo import BitbucketCreateRepo
 from classes.BitbucketDeleteRepo import BitbucketDeleteRepo
 from classes.BitbucketFindRepoInFile import BitbucketFindRepoInFile
@@ -53,7 +54,8 @@ def menu():
         bb = BitbucketDeleteRepo()
         bb.start()
     elif choice == "6":
-        clone_from_bitbucket()
+        bb = BitbucketClone()
+        bb.start()
     elif choice == "7":
         set_origin_url_bitbucket()
     elif choice == "8":
