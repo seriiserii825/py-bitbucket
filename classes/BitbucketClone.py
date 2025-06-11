@@ -4,6 +4,9 @@ from utils import pretty_print
 
 
 class BitbucketClone:
+    def __init__(self):
+        self.start()
+
     def start(self):
         pretty_print("Starting Bitbucket Clone process...")
         name, workspace = self.get_repo_from_file()

@@ -7,6 +7,9 @@ from utils import pretty_print
 
 
 class BitbucketDeleteRepo:
+    def __init__(self):
+        self.start()
+
     def start(self):
         repo, workpsace = self._get_repo()
         self._delete_repo(repo, workpsace)
@@ -21,7 +24,8 @@ class BitbucketDeleteRepo:
         )
 
     def _delete_repo(self, repo_name: str, workspace: str):
-        pretty_print(f"Deleting repository: {repo_name} in workspace: {workspace}")
+        pretty_print(
+            f"Deleting repository: {repo_name} in workspace: {workspace}")
         ac = AccountsCsv()
         account = ac.choose_account_by_email()
         bb_api = BitbucketApi(account.username, account.app_password)

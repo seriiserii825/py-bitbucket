@@ -4,6 +4,9 @@ from utils import pretty_print
 
 
 class BitbucketFindRepoInFile:
+    def __init__(self):
+        self.start()
+
     def start(self):
         bb = Bitbucket()
         try:

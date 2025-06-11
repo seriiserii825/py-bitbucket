@@ -3,6 +3,9 @@ from utils import pretty_print
 
 
 class GithubCloneRepo:
+    def __init__(self):
+        self.start()
+
     def start(self):
         self._clone_repo()
 

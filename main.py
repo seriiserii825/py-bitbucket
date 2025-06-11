@@ -12,11 +12,7 @@ from classes.GithubDeleteRepo import GithubDeleteRepo
 from classes.GithubDeleteRepos import GithubDeleteRepos
 from classes.GithubReposToFile import GithubReposToFile
 from utils import pretty_table
-from views import clone_from_bitbucket, clone_from_github
-from views import create_repo_on_github, delete_repos_on_github
-from views import delete_reop_on_github, set_origin_url_bitbucket
-from views import export_github_repos_to_csv, from_bitbucket_to_github
-from views import create_new_repo_in_bitbucket
+from views import set_origin_url_bitbucket
 
 
 def menu():
@@ -42,46 +38,43 @@ def menu():
 
     choice = input("Enter your choice: ")
     if choice == "1":
-        bb = BitbucketReposToFile()
-        bb.start()
+        BitbucketReposToFile()
         menu()
     elif choice == "2":
-        bm = BitbucketMirror()
-        bm.start()
+        BitbucketMirror()
+        BitbucketReposToFile()
     elif choice == "3":
-        bb = BitbucketFindRepoInFile()
-        bb.start()
+        BitbucketFindRepoInFile()
+        menu()
+    elif choice == "3":
+        BitbucketFindRepoInFile()
         menu()
     elif choice == "4":
-        bb = BitbucketCreateRepo()
-        bb.start()
-        menu()
+        BitbucketCreateRepo()
+        BitbucketReposToFile()
     elif choice == "5":
-        bb = BitbucketDeleteRepo()
-        bb.start()
+        BitbucketDeleteRepo()
+        BitbucketReposToFile()
     elif choice == "6":
-        bb = BitbucketClone()
-        bb.start()
+        BitbucketClone()
     elif choice == "7":
         set_origin_url_bitbucket()
     elif choice == "8":
-        gth = GithubReposToFile()
-        gth.start()
+        GithubReposToFile()
     elif choice == "9":
-        gth = GithubCreateRepoOnGithub()
-        gth.start()
+        GithubCreateRepoOnGithub()
+        GithubReposToFile()
     elif choice == "10":
-        gth = GithubCloneRepo()
-        gth.start()
+        GithubCloneRepo()
     elif choice == "11":
-        gth = GithubDeleteRepo()
-        gth.start()
+        GithubDeleteRepo()
+        GithubReposToFile()
     elif choice == "12":
-        gth = GithubDeleteRepos()
-        gth.start()
+        GithubDeleteRepos()
+        GithubReposToFile()
     elif choice == "13":
-        bb = BitbucketToGithub()
-        bb.start()
+        BitbucketToGithub()
+        GithubReposToFile()
     else:
         print("[red]Exiting the program...")
         exit(0)

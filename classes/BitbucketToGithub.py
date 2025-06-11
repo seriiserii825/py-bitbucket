@@ -4,6 +4,9 @@ from utils import pretty_print
 
 
 class BitbucketToGithub:
+    def __init__(self):
+        self.start()
+
     def start(self):
         print("Starting migration from Bitbucket to GitHub...")
         self._from_bitbucket_to_github()

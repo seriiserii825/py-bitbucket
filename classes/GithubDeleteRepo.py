@@ -4,6 +4,9 @@ from utils import pretty_print
 
 
 class GithubDeleteRepo:
+    def __init__(self):
+        self.start()
+
     def start(self):
         self.delete_reop_on_github()
 

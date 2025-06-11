@@ -4,6 +4,10 @@ from utils import pretty_print
 
 
 class GithubReposToFile:
+    def __init__(self):
+        pretty_print("Fetching Github Repositories to File")
+        self.start()
+
     def start(self):
         gth = GithubClass()
         try:

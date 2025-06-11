@@ -7,6 +7,9 @@ from utils import pretty_print
 
 
 class BitbucketMirror:
+    def __init__(self):
+        self.start()
+
     def start(self):
         repo_name, _ = self._clone_mirror_from_bitbucket()
         self._cd_cloned_repo(repo_name)

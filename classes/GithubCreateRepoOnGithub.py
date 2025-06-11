@@ -5,6 +5,9 @@ from utils import pretty_print
 
 
 class GithubCreateRepoOnGithub:
+    def __init__(self):
+        self.start()
+
     def start(self):
         self._create_repo_on_github()
 

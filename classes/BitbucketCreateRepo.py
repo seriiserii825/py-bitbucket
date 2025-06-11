@@ -4,6 +4,9 @@ from utils import pretty_print
 
 
 class BitbucketCreateRepo:
+    def __init__(self):
+        self.start()
+
     def start(self):
         repo_name = self._set_repo_name()
         workspace = self._select_workspace()
