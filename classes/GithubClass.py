@@ -142,6 +142,7 @@ class GithubClass:
             print("❌ Git command failed:", e)
 
     def delete_repos(self):
+        pretty_print("Deleting multiple repositories on GitHub...")
         repos = self._get_repos_from_file()
         if not repos:
             raise GithubException("No repositories found in the file.")
@@ -150,6 +151,7 @@ class GithubClass:
         if not selected_repos:
             raise GithubException("No repositories selected for deletion.")
 
+        pretty_print(f"Selected repositories for deletion: {selected_repos}")
         for repo_name in selected_repos:
             try:
                 self.delete_repo(repo_name)
