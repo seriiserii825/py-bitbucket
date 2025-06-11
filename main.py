@@ -32,7 +32,7 @@ def menu():
     pretty_table(table_header, table_columns, table_rows)
 
     choice = input("Enter your choice: ")
-    if choice == "2":
+    if choice == "1":
         bb = BitbucketReposToFile()
         bb.start()
         menu()
