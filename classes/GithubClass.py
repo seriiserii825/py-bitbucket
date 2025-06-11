@@ -70,19 +70,20 @@ class GithubClass:
             return False
 
     def clone_repo(self):
-        repo_name = input("Enter the repository name to clone: ")
+        repos = self._get_repos_from_file()
+        repo_name = fzf.prompt(repos)
+        repo_name = repo_name[0]
         if not repo_name:
-            print("❌ Repository name cannot be empty.")
+            pretty_print("Repository name cannot be empty.", error=True)
             return
         if not self.checkRepo():
-            print("❌ Cannot clone repository that does not exist.")
+            pretty_print("Exiting without cloning repository.", error=True)
             return
         clone_url = f"git@github.com:seriiserii825/{repo_name}.git"
 
         try:
             subprocess.run(["git", "clone", clone_url], check=True)
-            print(
-                f"[green]✅ Repository '{self.repo_name}' cloned successfully!")
+            pretty_print(f"🔗 URL: {clone_url}")
         except subprocess.CalledProcessError as e:
             print(f"❌ Failed to clone repository: {e}")
 
@@ -175,7 +176,8 @@ class GithubClass:
             "Accept": "application/vnd.github.v3+json",
         }
         pretty_print(f"url: {url}")
-        response = requests.delete(url, auth=(username, token), headers=headers)
+        response = requests.delete(url, auth=(
+            username, token), headers=headers)
 
         if response.status_code == 204:
             print(f"✅ Repository '{repo_name}' deleted successfully.")
