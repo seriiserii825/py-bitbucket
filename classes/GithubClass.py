@@ -8,7 +8,7 @@ from pathlib import Path
 from rich import print
 from execeptions.GithubException import GithubException
 from modules.git_mirror import clone_mirror_from_bitbucket
-from utils import selectMultiple
+from utils import pretty_print, selectMultiple
 from pyfzf.pyfzf import FzfPrompt
 
 
@@ -225,11 +225,13 @@ class GithubClass:
             exit(1)
 
     def export_github_repos_to_csv(self):
+        pretty_print("Exporting GitHub repositories to CSV file...")
         github_token = self._get_data_from_env("GITHUB_TOKEN")
         username = self._get_data_from_env("GITHUB_USERNAME")
         g = Github(github_token)
 
         try:
+            pretty_print("Fetching repositories from GitHub...")
             user = g.get_user(username)
             repos = user.get_repos()
 

@@ -5,6 +5,7 @@ from classes.BitbucketDeleteRepo import BitbucketDeleteRepo
 from classes.BitbucketFindRepoInFile import BitbucketFindRepoInFile
 from classes.BitbucketMirror import BitbucketMirror
 from classes.BitbucketReposToFile import BitbucketReposToFile
+from classes.GithubReposToFile import GithubReposToFile
 from utils import pretty_table
 from views import clone_from_bitbucket, clone_from_github
 from views import create_repo_on_github, delete_repos_on_github
@@ -24,12 +25,12 @@ def menu():
         ["5", "[blue]Delete repo on bitbucket"],
         ["6", "[blue]Clone repo on bitbucket"],
         ["7", "[blue]Set and push new origin bitbucket"],
-        ["8", "[green]Clone from github"],
+        ["8", "[green]From github to csv"],
         ["9", "[green]Create repo on github"],
         ["10", "[red]Delete repo on github"],
         ["11", "[red]Delete mutliple repos on github"],
         ["12", "[green]From bitbucket to github"],
-        ["13", "[green]From github to csv"],
+        ["13", "[green]Clone from github"],
         ["14", "[red]Exit"]
     ]
     pretty_table(table_header, table_columns, table_rows)
@@ -59,7 +60,8 @@ def menu():
     elif choice == "7":
         set_origin_url_bitbucket()
     elif choice == "8":
-        clone_from_github()
+        gth = GithubReposToFile()
+        gth.start()
     elif choice == "9":
         create_repo_on_github()
     elif choice == "10":
@@ -69,7 +71,7 @@ def menu():
     elif choice == "12":
         from_bitbucket_to_github()
     elif choice == "13":
-        export_github_repos_to_csv()
+        clone_from_github()
     else:
         print("[red]Exiting the program...")
         exit(0)
