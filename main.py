@@ -5,6 +5,7 @@ from classes.BitbucketDeleteRepo import BitbucketDeleteRepo
 from classes.BitbucketFindRepoInFile import BitbucketFindRepoInFile
 from classes.BitbucketMirror import BitbucketMirror
 from classes.BitbucketReposToFile import BitbucketReposToFile
+from classes.BitbucketToGithub import BitbucketToGithub
 from classes.GithubCloneRepo import GithubCloneRepo
 from classes.GithubCreateRepoOnGithub import GithubCreateRepoOnGithub
 from classes.GithubDeleteRepo import GithubDeleteRepo
@@ -79,7 +80,8 @@ def menu():
         gth = GithubDeleteRepos()
         gth.start()
     elif choice == "13":
-        from_bitbucket_to_github()
+        bb = BitbucketToGithub()
+        bb.start()
     else:
         print("[red]Exiting the program...")
         exit(0)

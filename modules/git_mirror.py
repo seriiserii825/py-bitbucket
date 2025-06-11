@@ -20,8 +20,8 @@ def git_mirror():
 def clone_mirror_from_bitbucket():
     bb = Bitbucket()
     repo = bb.get_repo_from_file()
-    repo_name = repo.split("/")[0]
-    workspace = repo.split("/")[1]
+    repo_name = repo.name
+    workspace = repo.workspace
     _clone_repo(repo_name, workspace)
     _cd_cloned_repo(repo_name)
     return (repo_name, workspace)
