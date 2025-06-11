@@ -5,6 +5,7 @@ from classes.BitbucketDeleteRepo import BitbucketDeleteRepo
 from classes.BitbucketFindRepoInFile import BitbucketFindRepoInFile
 from classes.BitbucketMirror import BitbucketMirror
 from classes.BitbucketReposToFile import BitbucketReposToFile
+from classes.GithubCreateRepoOnGithub import GithubCreateRepoOnGithub
 from classes.GithubReposToFile import GithubReposToFile
 from utils import pretty_table
 from views import clone_from_bitbucket, clone_from_github
@@ -63,7 +64,8 @@ def menu():
         gth = GithubReposToFile()
         gth.start()
     elif choice == "9":
-        create_repo_on_github()
+        gth = GithubCreateRepoOnGithub()
+        gth.start()
     elif choice == "10":
         delete_reop_on_github()
     elif choice == "11":
