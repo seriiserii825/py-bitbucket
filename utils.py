@@ -4,6 +4,8 @@ from rich.console import Console
 from rich.table import Table
 from rich import print
 
+from classes.Select import Select
+
 
 def selectOne(options: List[str]) -> str:
     """
@@ -18,19 +20,21 @@ def selectOne(options: List[str]) -> str:
 
 
 def selectMultiple(options: List[str]) -> List[str]:
-    """
-    Displays a terminal menu for selecting multiple options from a list.
-    """
-    terminal_menu = TerminalMenu(options,
-                                 multi_select=True,
-                                 show_multi_select_hint=True,
-                                 show_search_hint=True,
-                                 preview_command="bat --color=always {}", preview_size=0.75
-                                 )
-    menu_entry_indices = terminal_menu.show()
-    # print(menu_entry_indices)
-    # print(terminal_menu.chosen_menu_entries)
-    return terminal_menu.chosen_menu_entries
+    sl = Select()
+    return sl.select_with_fzf(options)
+    # """
+    # Displays a terminal menu for selecting multiple options from a list.
+    # """
+    # terminal_menu = TerminalMenu(options,
+    #                              multi_select=True,
+    #                              show_multi_select_hint=True,
+    #                              show_search_hint=True,
+    #                              preview_command="bat --color=always {}", preview_size=0.75
+    #                              )
+    # menu_entry_indices = terminal_menu.show()
+    # # print(menu_entry_indices)
+    # # print(terminal_menu.chosen_menu_entries)
+    # return terminal_menu.chosen_menu_entries
 
 
 def pretty_print(value, error=False):
