@@ -74,6 +74,10 @@ lm-arcobaleno-garda-home,blueline-wordpress-sites
 bs-fava,blueline-wordpress-sites
 bs-diber,blueline-wordpress-sites
 nuxt-gam-immobiliare,blueline-wordpress-sites
+bs-pallina,blueline-wordpress-sites
+vue-pdf-generator,blueline-wordpress-sites
+nuxt-pdf-generator,blueline-wordpress-sites
+bs-borgoluce-2,blueline-wordpress-sites
 core,blueline2
 ethanplants,blueline2
 xlux,blueline2
@@ -95,7 +99,6 @@ ar-luppi,sites-bludelego
 bs-why-not-caffe,sites-bludelego
 campingvittoria,sites-bludelego
 wp-pallinagelateria-ro,sites-bludelego
-bs-pallina,sites-bludelego
 bs-moonflower,sites-bludelego
 bs-non-solo-pizza,sites-bludelego
 bs-aldobrandini,sites-bludelego
@@ -234,7 +237,6 @@ bs-neon-lux,sites-bludelego
 ms-pizzaromana,sites-bludelego
 ms-forza4,sites-bludelego
 ar-laforchetta,sites-bludelego
-bs-borgoluce-2,sites-bludelego
 ar-spheragroup,sites-bludelego
 ms-copar-servizi,sites-bludelego
 bs-proseccoborgoluce,sites-bludelego

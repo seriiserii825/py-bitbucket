@@ -135,7 +135,6 @@ Mini
 mishka.loc
 mjml-emails
 my-app
-my-fonts
 my-gridsome-site
 mysql-excercizes
 nd-nodejs-without-sequelize
@@ -158,6 +157,7 @@ nuxt-express
 nuxt-mastering
 nuxt-nature
 nuxt-parcel-delivery
+nuxt-pdf-generator
 nuxt-restaurant
 nuxt-segalerba
 nuxt-shop
