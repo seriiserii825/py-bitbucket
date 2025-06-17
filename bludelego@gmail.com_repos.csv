@@ -1,4 +1,5 @@
 Name,Workspace
+nuxt-pdf-generator,nuxt-projects
 rewindapp,bludelego
 rewind_ios,bludelego
 rewindandroid,bludelego
@@ -76,8 +77,9 @@ bs-diber,blueline-wordpress-sites
 nuxt-gam-immobiliare,blueline-wordpress-sites
 bs-pallina,blueline-wordpress-sites
 vue-pdf-generator,blueline-wordpress-sites
-nuxt-pdf-generator,blueline-wordpress-sites
 bs-borgoluce-2,blueline-wordpress-sites
+bs-gadda,blueline-wordpress-sites
+lm-omp,blueline-wordpress-sites
 core,blueline2
 ethanplants,blueline2
 xlux,blueline2
@@ -141,7 +143,6 @@ bs-elieana,sites-bludelego
 bs-ottico-rachele,sites-bludelego
 bs_gamerecords,sites-bludelego
 bs-studiobazzo,sites-bludelego
-bs-gadda,sites-bludelego
 bs-ideagelato,sites-bludelego
 bs-fava,sites-bludelego
 ar-battecca,sites-bludelego
@@ -397,19 +398,3 @@ ar-zanini,sites-bludelego
 bs-erapra-veneto,sites-bludelego
 bs-palazzetti-ortofrutta,sites-bludelego
 oneair,oneair
-battistella,iurii_turcan
-ethanhr,iurii_turcan
-vanges,iurii_turcan
-red-system,iurii_turcan
-borrauto,iurii_turcan
-macservice,iurii_turcan
-tieffe,iurii_turcan
-dany-confezioni,iurii_turcan
-voicetrip,iurii_turcan
-medik,iurii_turcan
-neroni,iurii_turcan
-etruria,iurii_turcan
-bluelinehrflutter,iurii_turcan
-mdg-group,iurii_turcan
-eden,iurii_turcan
-cure,iurii_turcan
