@@ -46,6 +46,8 @@ cure_corporation_ios,bludelego
 conte_ios,bludelego
 abc-rifiuti-new,bludelego
 rewindkotlin,blueline-android
+gam,blueline-android
+conte,blueline-android
 rewind-ios,blueline-ios
 test,blueline-ios
 conte_ios,blueline-ios
@@ -80,6 +82,8 @@ vue-pdf-generator,blueline-wordpress-sites
 bs-borgoluce-2,blueline-wordpress-sites
 bs-gadda,blueline-wordpress-sites
 lm-omp,blueline-wordpress-sites
+lm-autotrasporti-deto-ve,blueline-wordpress-sites
+ms-larosablu,blueline-wordpress-sites
 core,blueline2
 ethanplants,blueline2
 xlux,blueline2
@@ -391,7 +395,6 @@ lm-coltelleria-massari,sites-bludelego
 bs-industrial-project,sites-bludelego
 bs-biesseclean,sites-bludelego
 ar-thermo,sites-bludelego
-ms-larosablu,sites-bludelego
 lm-onyma,sites-bludelego
 ar-fer,sites-bludelego
 ar-zanini,sites-bludelego
