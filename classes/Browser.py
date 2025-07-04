@@ -11,9 +11,8 @@ class Browser:
         print("Create new repo in blueline-wordpress-sites")
         print(url)
         webbrowser.open(url)
-        confirm = input(
-            "Press 'y' when you finished to create: ")
-        if confirm.lower() != 'y':
+        confirm = input("Press 'y' when you finished to create: ")
+        if confirm.lower() != "y":
             print("Aborting...")
             exit(1)
 
@@ -23,18 +22,16 @@ class Browser:
         print(group_url)
         webbrowser.open(group_url)
         confirm = input("Press 'y' when you have added the group: ")
-        if confirm.lower() != 'y':
+        if confirm.lower() != "y":
             print("Aborting...")
             exit(1)
-
 
     def change_main_barnch_in_browser(self, repo_name: str, workspace: str):
         print("Change main branch to main in your Bitbucket account.")
         change_url = f"https://bitbucket.org/{workspace}/{repo_name}/admin"
         print(change_url)
         webbrowser.open(change_url)
-        confirm = input(
-            "Press 'y' when you have changed the main branch to main: ")
-        if confirm.lower() != 'y':
+        confirm = input("Press 'y' when you have changed the main branch to main: ")
+        if confirm.lower() != "y":
             print("Aborting...")
             exit(1)

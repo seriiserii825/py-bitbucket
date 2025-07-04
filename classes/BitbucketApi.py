@@ -8,7 +8,7 @@ from utils import pretty_print
 
 class BitbucketApi:
     def __init__(self, username, app_password):
-        self.workspace = ''
+        self.workspace = ""
         self.username = username
         self.app_password = app_password
         self.auth = HTTPBasicAuth(self.username, self.app_password)
@@ -20,7 +20,7 @@ class BitbucketApi:
         if response.ok:
             data = response.json()
             for item in data.get("values", []):
-                workspace = item['slug']
+                workspace = item["slug"]
                 workspaces.append(workspace)
             return workspaces
         else:
@@ -49,10 +49,12 @@ class BitbucketApi:
                 pretty_print("No more repositories to fetch.", error=True)
                 break
             for repo in values:
-                repos.append(RepoType(
-                    name=repo["full_name"],
-                    workspace=workspace,
-                ))
+                repos.append(
+                    RepoType(
+                        name=repo["full_name"],
+                        workspace=workspace,
+                    )
+                )
             url = data.get("next")  # Get the next page URL
             count += 1
         # Optionally clean up
@@ -64,7 +66,7 @@ class BitbucketApi:
             "scm": "git",
             "is_private": True,
             "project": {"key": project_key},
-            "name": repo_name
+            "name": repo_name,
         }
         return requests.post(url, json=payload, auth=self.auth)
 
@@ -77,7 +79,5 @@ class BitbucketApi:
             pretty_print("Repository deleted successfully.")
         except requests.RequestException as e:
             pretty_print(f"Request error: {e}", error=True)
-            raise BitbucketApiException(
-                f"Error deleting repository: {e}"
-            )
+            raise BitbucketApiException(f"Error deleting repository: {e}")
         return response

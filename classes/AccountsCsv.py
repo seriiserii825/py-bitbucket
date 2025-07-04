@@ -15,13 +15,13 @@ class AccountsCsv:
         """
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)
-        self.file_path = os.path.join(self.ROOT_DIR, 'accounts.csv')
+        self.file_path = os.path.join(self.ROOT_DIR, "accounts.csv")
 
     def _from_file_to_array(self) -> List[AccountType]:
         if not os.path.exists(self.file_path):
             raise AccountException(f"File {self.file_path} does not exist.")
         rows = []
-        with open(self.file_path, newline='') as csvfile:
+        with open(self.file_path, newline="") as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 account = AccountType(
@@ -45,15 +45,21 @@ class AccountsCsv:
     def print_account_values_by_email(self, email):
         account = self.get_account_by_email(email)
         table_title = "Account Details"
-        table_headers = ["Email", "Workspace", "Project Key",
-                         "Username", "App Password", "Is Private"]
+        table_headers = [
+            "Email",
+            "Workspace",
+            "Project Key",
+            "Username",
+            "App Password",
+            "Is Private",
+        ]
         table_rows = [
             account.email,
             account.workspace,
             account.project_key,
             account.username,
             account.app_password,
-            str(account.is_private)
+            str(account.is_private),
         ]
         if account:
             pretty_table(table_title, table_headers, [table_rows])

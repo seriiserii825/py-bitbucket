@@ -32,7 +32,7 @@ def menu():
         ["11", "[red]Delete repo on github"],
         ["12", "[red]Delete mutliple repos on github"],
         ["13", "[green]From bitbucket to github"],
-        ["14", "[red]Exit"]
+        ["14", "[red]Exit"],
     ]
     pretty_table(table_header, table_columns, table_rows)
 

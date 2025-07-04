@@ -17,13 +17,17 @@ class GithubCreateRepoOnGithub:
         try:
             current_dir = os.getcwd()
             pretty_print(f"Current directory: {current_dir}")
-            agree = input(
-                "Do you want to create a repository from the current folder? (yes/no): ").strip().lower()
-            if agree == 'yes':
+            agree = (
+                input(
+                    "Do you want to create a repository from the current folder? (yes/no): "
+                )
+                .strip()
+                .lower()
+            )
+            if agree == "yes":
                 gth.create_repo_from_folder()
             else:
-                pretty_print(
-                    "Failed to create a repository. Exiting...", error=True)
+                pretty_print("Failed to create a repository. Exiting...", error=True)
                 exit()
         except GithubException as e:
             pretty_print(f"Error: {e}", error=True)

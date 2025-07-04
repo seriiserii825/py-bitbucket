@@ -1,23 +1,23 @@
-import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
-import requests
 import time
 
-class MySelenium():
+
+class MySelenium:
     def __init__(self):
         super().__init__()  # <-- This initializes MyConfig
-        self.service = Service(executable_path='/usr/bin/chromedriver')
-        self.options = webdriver.ChromeOptions() 
-        self.options.add_argument("user-data-dir=/home/serii/.config/google-chrome/My-profile") #Path to your chrome profile
+        self.service = Service(executable_path="/usr/bin/chromedriver")
+        self.options = webdriver.ChromeOptions()
+        self.options.add_argument(
+            "user-data-dir=/home/serii/.config/google-chrome/My-profile"
+        )  # Path to your chrome profile
         self.driver = webdriver.Chrome(service=self.service, options=self.options)
         self.account_url = "https://reggiocalor.altuofianco.com"
         self.sitem_login = "https://id.atlassian.com/login"
-        current_dir_path = os.getcwd()
         # self.theme_name = os.path.basename(current_dir_path)
         # self.pr = Project(self.theme_name)
         # self.project = self.pr.getProject()
@@ -64,12 +64,19 @@ class MySelenium():
     #
     def waitForCaptcha(self):
         try:
-            WebDriverWait(self.driver, 1).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".aiowps-captcha-answer")))
-            aiowps_captcha_answer = self.driver.find_element(By.CSS_SELECTOR, ".aiowps-captcha-answer")
+            WebDriverWait(self.driver, 1).until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, ".aiowps-captcha-answer")
+                )
+            )
+            aiowps_captcha_answer = self.driver.find_element(
+                By.CSS_SELECTOR, ".aiowps-captcha-answer"
+            )
             if aiowps_captcha_answer:
                 time.sleep(10)
         except TimeoutException:
             return
+
     #
     # def restoreBackupInChrome(self):
     #     self.loginToSite()

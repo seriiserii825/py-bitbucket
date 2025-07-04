@@ -79,8 +79,7 @@ def _change_main_barnch_in_browser(repo_name: str):
     change_url = f"https://bitbucket.org/blueline-wordpress-sites/{repo_name}/admin"
     print(change_url)
     webbrowser.open(change_url)
-    confirm = input(
-        "Press 'y' when you have changed the main branch to main: ")
-    if confirm.lower() != 'y':
+    confirm = input("Press 'y' when you have changed the main branch to main: ")
+    if confirm.lower() != "y":
         print("Aborting...")
         exit(1)

@@ -85,9 +85,7 @@ def from_bitbucket_to_github():
         repo_name = gth.clone_mirror_from_bitbucket()
         repo_exists_on_github = gth.check_repo_on_github(repo_name)
         if repo_exists_on_github:
-            raise GithubException(
-                f"Repository {repo_name} already exists on GitHub."
-            )
+            raise GithubException(f"Repository {repo_name} already exists on GitHub.")
         gth.create_repo_by_arg(repo_name)
         gth.push_mirror_to_github(repo_name)
     except GithubException as e:

@@ -16,6 +16,7 @@ def selectOne(options: List[str]) -> str:
     menu_entry_index = terminal_menu.show()
     return options[menu_entry_index]
 
+
 # selectOne(getThemes())
 
 

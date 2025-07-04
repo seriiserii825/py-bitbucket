@@ -8,7 +8,6 @@ from execeptions.AccountException import AccountException
 from pyfzf.pyfzf import FzfPrompt
 
 from execeptions.BitbucketException import BitbucketException
-from my_types import repo_type
 from my_types.account_type import AccountType
 from my_types.repo_type import RepoType
 from utils import pretty_print, pretty_table, selectOne
@@ -17,7 +16,7 @@ from utils import pretty_print, pretty_table, selectOne
 fzf = FzfPrompt()
 
 
-class Bitbucket():
+class Bitbucket:
     def __init__(self) -> None:
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)
@@ -41,7 +40,8 @@ class Bitbucket():
 
         if not account:
             raise AccountException(
-                "Account not selected. Please choose an account first.")
+                "Account not selected. Please choose an account first."
+            )
         self._printAccountByEmail(account.email)
         workspaces = self._get_workspaces_from_api(account)
         file_name = f"{account.email}_repos.csv"
@@ -53,8 +53,7 @@ class Bitbucket():
             writer.writerow(["Name", "Workspace"])
 
         for workspace in workspaces:
-            repos: List[RepoType] = self._get_repos_by_workspace(
-                workspace, account)
+            repos: List[RepoType] = self._get_repos_by_workspace(workspace, account)
             self._repos_to_file(repos, account)
 
     def _printAccountByEmail(self, email):
@@ -65,7 +64,7 @@ class Bitbucket():
         return self._get_account_from_file()
 
     def set_new_origin(self) -> None:
-        repo_from_file = self.get_repo_from_file()
+        pass
         # repo_name = repo_from_file.split("/")[0]
         # workspace = repo_from_file.split("/")[1]
         # remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
@@ -85,13 +84,11 @@ class Bitbucket():
 
     def push_origin_force(self, workspace: str, repo_name: str) -> None:
         remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
-        push_cmd = ["git", "push -u",  "origin main", "--force", remote_url]
+        push_cmd = ["git", "push -u", "origin main", "--force", remote_url]
         try:
             subprocess.run(push_cmd, check=True, shell=True)
         except subprocess.CalledProcessError as e:
-            raise BitbucketException(
-                f"Failed to push to origin: {e}"
-            ) from e
+            raise BitbucketException(f"Failed to push to origin: {e}") from e
 
     def push_to_mirror_repo(self, repo_name: str, workspace: str) -> None:
         repo_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
@@ -99,9 +96,7 @@ class Bitbucket():
         try:
             subprocess.run(command, check=True, shell=True)
         except Exception as e:
-            raise BitbucketException(
-                f"Error pushing to new repository: {e}"
-            )
+            raise BitbucketException(f"Error pushing to new repository: {e}")
 
     def set_mirror_origin(self, repo_name: str, workspace: str) -> None:
         remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
@@ -109,9 +104,7 @@ class Bitbucket():
         try:
             subprocess.run(set_url_cmd, check=True)
         except subprocess.CalledProcessError:
-            raise BitbucketException(
-                f"Failed to set new origin URL: {set_url_cmd}"
-            )
+            raise BitbucketException(f"Failed to set new origin URL: {set_url_cmd}")
 
     def _get_account_from_file(self) -> AccountType:
         ac = AccountsCsv()
@@ -140,9 +133,7 @@ class Bitbucket():
                 # Get the repo name from full name
                 repo_name = repo.name.split("/")[-1]
                 writer.writerow([repo_name, repo.workspace])
-        pretty_print(
-            f"Repositories saved to {file_path}"
-        )
+        pretty_print(f"Repositories saved to {file_path}")
 
     def _delete_repo_file(self, file_path) -> None:
         if not os.path.exists(file_path):
@@ -157,7 +148,7 @@ class Bitbucket():
         selected_repo = fzf.prompt(repos_for_fzf)
         return RepoType(
             name=selected_repo[0].split("/")[0],
-            workspace=selected_repo[0].split("/")[1]
+            workspace=selected_repo[0].split("/")[1],
         )
 
     def find_repo_in_file(self):
@@ -172,14 +163,12 @@ class Bitbucket():
             table_rows = [[repo.name, repo.workspace] for repo in finded_repos]
             pretty_table(table_title, table_columns, table_rows)
         else:
-            raise BitbucketException(
-                f"Repository '{repo_name}' not found in file.")
+            raise BitbucketException(f"Repository '{repo_name}' not found in file.")
 
     def check_repo_and_workspace_in_file(self, repo_name, workspace) -> bool:
         repos = self._get_repos_from_file()
         return any(
-            repo.name == repo_name and repo.workspace == workspace
-            for repo in repos
+            repo.name == repo_name and repo.workspace == workspace for repo in repos
         )
 
     def _get_repos_from_file(self) -> List[RepoType]:
@@ -223,13 +212,10 @@ class Bitbucket():
         bb_api = BitbucketApi(account.username, account.app_password)
 
         new_repo = bb_api._createRepoOnBitbucketApi(
-            workspace=workspace,
-            project_key=project_key,
-            repo_name=repo_name
+            workspace=workspace, project_key=project_key, repo_name=repo_name
         )
         if new_repo.status_code in (200, 201):
-            print(
-                f"[green]✅ Repository '{repo_name}' created successfully!")
+            print(f"[green]✅ Repository '{repo_name}' created successfully!")
             self.is_in_new_account = True
             return repo_name
         else:
@@ -239,7 +225,7 @@ class Bitbucket():
             )
 
     def set_repo_name(self) -> str:
-        pretty_print('Please enter the new repository name:')
+        pretty_print("Please enter the new repository name:")
         repo_name = input("Enter the new repository name: ")
         if not repo_name:
             raise BitbucketException("Repository name cannot be empty.")

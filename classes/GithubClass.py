@@ -21,7 +21,7 @@ class GithubClass:
         self.repo_name = ""
         self.ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         self.ROOT_DIR = os.path.dirname(self.ROOT_DIR)
-        self.file_path = os.path.join(self.ROOT_DIR, 'github_repos.csv')
+        self.file_path = os.path.join(self.ROOT_DIR, "github_repos.csv")
 
     def setRepoName(self):
         self.repo_name = input("Enter the repository name: ")
@@ -34,7 +34,7 @@ class GithubClass:
             "q": f"{word_in_repo} user:{username} in:name",
             "sort": "stars",
             "order": "desc",
-            "per_page": 10
+            "per_page": 10,
         }
 
         response = requests.get(url, params=params)
@@ -44,15 +44,18 @@ class GithubClass:
             total = data.get("total_count", 0)
             if total > 0:
                 print(
-                    f"✅ Found {total} repositories in user '{username}' containing '{word_in_repo}':")
+                    f"✅ Found {total} repositories in user '{username}' containing '{word_in_repo}':"
+                )
                 for repo in data["items"]:
                     print(f"- {repo['full_name']}: {repo['html_url']}")
             else:
                 print(
-                    f"❌ No repositories found in user '{username}' containing '{word_in_repo}'.")
+                    f"❌ No repositories found in user '{username}' containing '{word_in_repo}'."
+                )
         else:
             print(
-                f"❌ Failed to search repositories. Status code: {response.status_code}")
+                f"❌ Failed to search repositories. Status code: {response.status_code}"
+            )
 
     def checkRepo(self):
         url = f"{self.repo_http}/{self.repo_name}"
@@ -61,12 +64,10 @@ class GithubClass:
             print(f"[green]✅ Repository '{self.repo_name}' exists on GitHub.")
             return True
         elif response.status_code == 404:
-            print(
-                f"❌ Repository '{self.repo_name}' does not exist on GitHub.")
+            print(f"❌ Repository '{self.repo_name}' does not exist on GitHub.")
             return False
         else:
-            print(
-                f"❌ Failed to check repository. Status code: {response.status_code}")
+            print(f"❌ Failed to check repository. Status code: {response.status_code}")
             return False
 
     def clone_repo(self):
@@ -89,9 +90,12 @@ class GithubClass:
 
     def create_repo_from_folder(self):
         folder_name = os.path.basename(os.getcwd())
-        agree = input(
-            f"From current folder name, '{folder_name}', are you agree, (y/n): ").strip().lower()
-        if agree != 'y':
+        agree = (
+            input(f"From current folder name, '{folder_name}', are you agree, (y/n): ")
+            .strip()
+            .lower()
+        )
+        if agree != "y":
             exit("Exiting without creating repository.")
         self._create_repo(folder_name)
         self._push_created_repo(folder_name)
@@ -106,16 +110,12 @@ class GithubClass:
         repo_data = {
             "name": repo_name,
             "description": "Created via Python script",
-            "private": False  # Set to True for a private repository
+            "private": False,  # Set to True for a private repository
         }
 
         url = "https://api.github.com/user/repos"
 
-        response = requests.post(
-            url,
-            json=repo_data,
-            auth=(USERNAME, TOKEN)
-        )
+        response = requests.post(url, json=repo_data, auth=(USERNAME, TOKEN))
 
         if response.status_code == 201:
             print(f"✅ Repository '{repo_data['name']}' created successfully.")
@@ -124,7 +124,8 @@ class GithubClass:
             print(f"❌ Failed to create repository: {response.status_code}")
             raise GithubException(
                 f"Error creating repository: \
-                {response.json().get('message', 'Unknown error')}")
+                {response.json().get('message', 'Unknown error')}"
+            )
 
     def _push_created_repo(self, repo_name: str):
         try:
@@ -132,11 +133,9 @@ class GithubClass:
             os.system("touch README.md")
             subprocess.run(["git", "init"], check=True)
             subprocess.run(["git", "add", "."], check=True)
-            subprocess.run(
-                ["git", "commit", "-m", "Initial commit"], check=True)
+            subprocess.run(["git", "commit", "-m", "Initial commit"], check=True)
             subprocess.run(["git", "branch", "-M", "main"], check=True)
-            subprocess.run(
-                ["git", "remote", "add", "origin", repo_url], check=True)
+            subprocess.run(["git", "remote", "add", "origin", repo_url], check=True)
             subprocess.run(["git", "push", "-u", "origin", "main"], check=True)
             print("🚀 Code pushed to GitHub!")
         except subprocess.CalledProcessError as e:
@@ -157,10 +156,9 @@ class GithubClass:
             try:
                 self.delete_repo(repo_name)
             except GithubException as e:
-                raise GithubException(
-                    f"Failed to delete repository '{repo_name}': {e}")
+                raise GithubException(f"Failed to delete repository '{repo_name}': {e}")
 
-    def delete_repo(self, repo_name_arg: str = ''):
+    def delete_repo(self, repo_name_arg: str = ""):
         pretty_print("Deleting a repository on GitHub...")
         token = self._get_data_from_env("GITHUB_TOKEN")
         username = self._get_data_from_env("GITHUB_USERNAME")
@@ -176,27 +174,25 @@ class GithubClass:
             "Accept": "application/vnd.github.v3+json",
         }
         pretty_print(f"url: {url}")
-        response = requests.delete(url, auth=(
-            username, token), headers=headers)
+        response = requests.delete(url, auth=(username, token), headers=headers)
 
         if response.status_code == 204:
             print(f"✅ Repository '{repo_name}' deleted successfully.")
         elif response.status_code == 404:
-            raise GithubException(
-                "Repository not found or insufficient permissions.")
+            raise GithubException("Repository not found or insufficient permissions.")
         else:
             raise GithubException(
                 f"Failed to delete repository: {response.status_code} \
-                - {response.json().get('message', 'Unknown error')}")
+                - {response.json().get('message', 'Unknown error')}"
+            )
 
     def _get_data_from_env(self, key: str) -> str:
         current_script_path = Path(__file__).resolve()
-        dotenv_path = current_script_path.parents[1] / '.env'
+        dotenv_path = current_script_path.parents[1] / ".env"
         load_dotenv(dotenv_path)
 
         if not os.getenv(key):
-            raise GithubException(
-                f"{key} not found in .env file.")
+            raise GithubException(f"{key} not found in .env file.")
         api_key = os.getenv(key)
         if not api_key:
             raise GithubException(f"{key} is empty in .env file.")
@@ -216,9 +212,7 @@ class GithubClass:
             subprocess.run(url, shell=True, check=True)
             print(f"✅ Successfully pushed mirror to GitHub: {repo_name}")
         except subprocess.CalledProcessError as e:
-            raise GithubException(
-                f"❌ Failed to push mirror to GitHub: {e}"
-            )
+            raise GithubException(f"❌ Failed to push mirror to GitHub: {e}")
 
     def _set_new_origin(self, repo_name: str, user_name: str):
         remote_url = f"git@github.com:{user_name}/{repo_name}.git"
@@ -240,21 +234,23 @@ class GithubClass:
             user = g.get_user(username)
             repos = user.get_repos()
 
-            with open(self.file_path, mode='w', newline='', encoding='utf-8') as file:
+            with open(self.file_path, mode="w", newline="", encoding="utf-8") as file:
                 writer = csv.writer(file)
                 writer.writerow(["Name"])
 
                 for repo in repos:
-                    writer.writerow([
-                        repo.name,
-                    ])
+                    writer.writerow(
+                        [
+                            repo.name,
+                        ]
+                    )
 
         except Exception as e:
             print(f"❌ Error: {e}")
 
     def _get_repos_from_file(self):
         repos = []
-        with open(self.file_path, mode='r') as file:
+        with open(self.file_path, mode="r") as file:
             reader = csv.reader(file)
             next(reader)
             for row in reader:
