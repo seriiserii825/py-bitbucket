@@ -107,6 +107,11 @@ ib-athon,blueline-wordpress-sites
 bs-monnalisa-apicella,blueline-wordpress-sites
 lm-pasticceria-cake-lab,blueline-wordpress-sites
 lm-sirio-srl,blueline-wordpress-sites
+ar-fer,blueline-wordpress-sites
+ar-thermo,blueline-wordpress-sites
+ar-zanini,blueline-wordpress-sites
+bs-eti-srl,blueline-wordpress-sites
+bs-ergon-tecnica,blueline-wordpress-sites
 core,blueline2
 ethanplants,blueline2
 xlux,blueline2
@@ -375,7 +380,6 @@ lm-daff-logistics,sites-bludelego
 lm-powertech-srl-catellani-5-0,sites-bludelego
 bs-rewind,sites-bludelego
 bs-autofficina-miniotti,sites-bludelego
-bs-eti-srl,sites-bludelego
 lm-dr-stefano-petrillo,sites-bludelego
 bs-ferrara-pneumatici,sites-bludelego
 ar-imed,sites-bludelego
@@ -386,7 +390,6 @@ bs-dalmas,sites-bludelego
 lm-saip-srl,sites-bludelego
 bs-sigma,sites-bludelego
 lm-veniceplan,sites-bludelego
-bs-ergon-tecnica,sites-bludelego
 lm-cooking-dya,sites-bludelego
 bs-fratelli-casarin,sites-bludelego
 bs-officina-bmc,sites-bludelego
@@ -415,10 +418,7 @@ bs-profumeria-riccio,sites-bludelego
 lm-coltelleria-massari,sites-bludelego
 bs-industrial-project,sites-bludelego
 bs-biesseclean,sites-bludelego
-ar-thermo,sites-bludelego
 lm-onyma,sites-bludelego
-ar-fer,sites-bludelego
-ar-zanini,sites-bludelego
 bs-erapra-veneto,sites-bludelego
 bs-palazzetti-ortofrutta,sites-bludelego
 oneair,oneair
