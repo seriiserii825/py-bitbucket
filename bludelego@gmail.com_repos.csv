@@ -112,6 +112,7 @@ ar-thermo,blueline-wordpress-sites
 ar-zanini,blueline-wordpress-sites
 bs-eti-srl,blueline-wordpress-sites
 bs-ergon-tecnica,blueline-wordpress-sites
+bs-antiche-porte,blueline-wordpress-sites
 core,blueline2
 ethanplants,blueline2
 xlux,blueline2
@@ -326,7 +327,6 @@ bs-remax-collection,sites-bludelego
 bs-dm-officine,sites-bludelego
 ar-taricta,sites-bludelego
 ar-unicosegno,sites-bludelego
-bs-antiche-porte,sites-bludelego
 lv-atfdevicesdev,sites-bludelego
 lv-silcompa,sites-bludelego
 ar-siced,sites-bludelego
