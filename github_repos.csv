@@ -153,6 +153,7 @@ node-jwt
 nuxt-bs
 nuxt-burdujasergiu
 nuxt-course
+nuxt-dashcore
 nuxt-ecommerce
 nuxt-educore
 nuxt-express
@@ -198,6 +199,7 @@ py-arch
 py-audio
 py-bitbucket
 py-classes
+py-clean-code
 py-clipboard
 py-codewars
 py-coffee-machine
