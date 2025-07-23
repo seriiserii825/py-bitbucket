@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 .env
+uv.lock
 
 newRepoData.py
 oldRepoData.py
