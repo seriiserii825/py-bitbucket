@@ -153,6 +153,7 @@ node-jwt
 nuxt-bs
 nuxt-burdujasergiu
 nuxt-course
+nuxt-dashcore
 nuxt-ecommerce
 nuxt-educore
 nuxt-express
@@ -228,6 +229,7 @@ py-scss
 py-smtp-email
 py-snake-game
 py-sync-settings
+py-test
 py-turtle
 py-turtle-race
 py-usa
