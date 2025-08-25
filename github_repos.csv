@@ -112,7 +112,7 @@ lv-avanasiev.loc
 lv-breeze
 lv-burdujasergiu
 lv-ecommerce
-lv-educore
+lv-educore-legacy
 lv-eliseev
 lv-first-project
 lv-kazim-blog.loc
@@ -143,6 +143,7 @@ nd-nodejs-without-sequelize
 nd-sequelize
 neovim-larichev
 neovim-lua
+new-test
 next-auth
 next-blog
 next-course
@@ -155,7 +156,7 @@ nuxt-burdujasergiu
 nuxt-course
 nuxt-dashcore
 nuxt-ecommerce
-nuxt-educore
+nuxt-educore-legacy
 nuxt-express
 nuxt-mastering
 nuxt-nature
