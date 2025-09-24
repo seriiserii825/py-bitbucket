@@ -187,7 +187,6 @@ php_course
 pink-all
 pinkrio
 pizzamania
-plugins-wp
 portfolio
 portfolio.loc
 PortofolioWebsite
@@ -223,6 +222,7 @@ py-oop
 py-oop-coffee-machine
 py-openweather
 py-pacman
+py-parser
 py-parsing
 py-password
 py-ping-pong
@@ -322,6 +322,7 @@ vue-3
 vue-ad
 vue-components
 vue-html
+vue-html-rules
 vue-interviews
 vue-laravel-9
 vue-lavrik-youtube
