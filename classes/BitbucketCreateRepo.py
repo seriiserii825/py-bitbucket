@@ -1,5 +1,7 @@
 from classes.Bitbucket import Bitbucket
 from classes.Browser import Browser
+from classes.Clipboard import ClipboardManager
+from classes.Notification import Notification
 from utils import pretty_print
 
 
@@ -9,6 +11,8 @@ class BitbucketCreateRepo:
 
     def start(self):
         repo_name = self._set_repo_name()
+        ClipboardManager.write(repo_name)
+        Notification.notify("Repo name copied to clipboard", repo_name)
         workspace = self._select_workspace()
         self.browser_create_and_edit_group(workspace, repo_name)
 
