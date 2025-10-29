@@ -379,6 +379,7 @@ medik_ios,blueline-ios
 voicetrip_ios,blueline-ios
 moro_group_ios,blueline-ios
 borrauto,blueline-ios
+noa,blueline-ios
 rewindkotlin,blueline-android
 gam,blueline-android
 conte,blueline-android
@@ -386,6 +387,7 @@ ethan-android,blueline-android
 ethanhr-android,blueline-android
 gam_multiplatform,blueline-android
 findme,blueline-android
+noa,blueline-android
 bs-francesca-by-sottini,blueline-wordpress-sites
 bs-vite,blueline-wordpress-sites
 lm-hep-srl,blueline-wordpress-sites
@@ -468,3 +470,4 @@ bs-bcm-meccanica,blueline-wordpress-sites
 bs-top-insurance-broker,blueline-wordpress-sites
 bs-iole,blueline-wordpress-sites
 bs-milone-impianti,blueline-wordpress-sites
+ar-tt-carservice,blueline-wordpress-sites
