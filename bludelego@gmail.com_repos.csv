@@ -390,6 +390,7 @@ gam_multiplatform,blueline-android
 findme,blueline-android
 noa,blueline-android
 easy-estate,blueline-android
+macservice-multiplatform,blueline-android
 bs-francesca-by-sottini,blueline-wordpress-sites
 bs-vite,blueline-wordpress-sites
 lm-hep-srl,blueline-wordpress-sites
@@ -483,3 +484,4 @@ bs-cecchini-christian,blueline-wordpress-sites
 ag-accademia-4accordi,blueline-wordpress-sites
 lm-stomatologica,blueline-wordpress-sites
 vue-silcompa,blueline-wordpress-sites
+bs-sbe,blueline-wordpress-sites
