@@ -16,6 +16,7 @@ bs-api
 bugfix
 bun-init
 chrome-autocopy
+chrome-wp-admin
 CleanCode
 cod4
 code-wars
@@ -112,6 +113,7 @@ laravel.doc
 lavrik-javascript
 letters
 libs
+local-addon-search-project
 lv-auth
 lv-avanasiev.loc
 lv-breeze
@@ -330,6 +332,7 @@ typescript-course
 typescript_lessongs
 ucauto
 v-notes
+v0app
 VanillaJS
 venevsky.loc
 vim-golf
