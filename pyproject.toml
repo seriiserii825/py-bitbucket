@@ -16,4 +16,5 @@ dependencies = [
     "requests>=2.32.4",
     "rich>=14.1.0",
     "simple-term-menu>=1.6.6",
+    "types-requests>=2.32.4.20260107",
 ]
