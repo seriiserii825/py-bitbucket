@@ -16,6 +16,7 @@ bs-api
 bugfix
 bun-init
 chrome-autocopy
+chrome-wp-admin
 CleanCode
 cod4
 code-wars
@@ -75,6 +76,7 @@ html-art
 html-bazzo
 html-bunavestire
 html-gsap
+html-hydra-valves
 html-irvas
 html-petricenco-javascript-classes
 html-restaurant-files
@@ -111,6 +113,7 @@ laravel.doc
 lavrik-javascript
 letters
 libs
+local-addon-search-project
 lv-auth
 lv-avanasiev.loc
 lv-breeze
@@ -164,6 +167,7 @@ next-my-blog
 next-proshop
 nextjs-course-code
 node-jwt
+notification-for-telegram
 nuxt-bs
 nuxt-burdujasergiu
 nuxt-course
@@ -193,6 +197,7 @@ oc-resale
 oop-eliseev.loc
 oop.loc
 oop.local
+otp-login-auto
 passwords
 pen-reveal-on-scroll
 php-oop
@@ -327,6 +332,7 @@ typescript-course
 typescript_lessongs
 ucauto
 v-notes
+v0app
 VanillaJS
 venevsky.loc
 vim-golf
@@ -417,7 +423,6 @@ wp-underscores-webpack
 wp-verta.loc
 wp-webforworld.loc
 wp-woocommerce
-wpglobus.2.6.8
 wp_cleanmag.loc
 wp_houses.loc
 wp_professional
