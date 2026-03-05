@@ -107,10 +107,12 @@ class GithubClass:
         USERNAME = self._get_data_from_env("GITHUB_USERNAME")
         TOKEN = self._get_data_from_env("GITHUB_TOKEN")
 
+        is_private = input("Make repository private? (y/n): ").strip().lower() == "y"
+
         repo_data = {
             "name": repo_name,
             "description": "Created via Python script",
-            "private": False,  # Set to True for a private repository
+            "private": is_private,
         }
 
         url = "https://api.github.com/user/repos"
@@ -231,7 +233,7 @@ class GithubClass:
 
         try:
             pretty_print("Fetching repositories from GitHub...")
-            user = g.get_user(username)
+            user = g.get_user()
             repos = user.get_repos()
 
             with open(self.file_path, mode="w", newline="", encoding="utf-8") as file:
