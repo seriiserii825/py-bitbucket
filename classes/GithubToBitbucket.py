@@ -1,3 +1,4 @@
+import csv
 import os
 import subprocess
 
@@ -32,11 +33,17 @@ class GithubToBitbucket:
         github_repos = self._get_github_repos_from_file()
         selected = fzf.prompt(github_repos)
         repo_name = selected[0]
-        username = self._get_github_username()
-        clone_url = f"git@github.com:{username}/{repo_name}.git"
-        command = f"git clone --mirror {clone_url}"
-        print(f"command: {command}")
-        os.system(command)
+        repo_git_name = f"{repo_name}.git"
+        if os.path.exists(repo_git_name):
+            print(f"Directory '{repo_git_name}' already exists, skipping clone.")
+        else:
+            username = self._get_github_username()
+            clone_url = f"git@github.com:{username}/{repo_name}.git"
+            command = f"git clone --mirror {clone_url}"
+            print(f"command: {command}")
+            result = subprocess.run(command, shell=True)
+            if result.returncode != 0:
+                raise BitbucketException(f"Failed to clone repository '{repo_name}' from GitHub.")
         return repo_name
 
     def _cd_cloned_repo(self, repo_name: str):
@@ -57,6 +64,8 @@ class GithubToBitbucket:
         )
         if response.status_code in (200, 201):
             print(f"✅ Repository '{repo_name}' created on Bitbucket workspace '{workspace}'.")
+        elif response.status_code == 400 and "already exists" in response.text:
+            print(f"Repository '{repo_name}' already exists on Bitbucket, skipping creation.")
         else:
             raise BitbucketException(
                 f"Failed to create repository '{repo_name}' on Bitbucket. "
@@ -73,7 +82,6 @@ class GithubToBitbucket:
             raise BitbucketException(f"Failed to push mirror to Bitbucket: {e}")
 
     def _get_github_repos_from_file(self) -> list:
-        import csv
         root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         file_path = os.path.join(root_dir, "github_repos.csv")
         repos = []
@@ -87,12 +95,11 @@ class GithubToBitbucket:
         return repos
 
     def _get_github_username(self) -> str:
-        import os as _os
         from pathlib import Path
         from dotenv import load_dotenv
         root_dir = Path(__file__).resolve().parents[1]
         load_dotenv(root_dir / ".env")
-        username = _os.getenv("GITHUB_USERNAME")
+        username = os.getenv("GITHUB_USERNAME")
         if not username:
             raise BitbucketException("GITHUB_USERNAME not found in .env file.")
         return username
