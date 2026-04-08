@@ -28,6 +28,7 @@ bugfix
 bun-init
 chrome-autocopy
 chrome-image
+chrome-svg-copy
 chrome-wp-admin
 CleanCode
 cod4
@@ -128,6 +129,7 @@ lavrik-javascript
 letters
 libs
 local-addon-search-project
+local-cli
 lv-auth
 lv-avanasiev.loc
 lv-breeze
