@@ -7,7 +7,6 @@ adonis-course
 an-treviso
 angular-it-proger
 angular-schwarzmuller
-autofill
 avvocatoaltuofianco-template-dev
 base-chrome-vue-extension
 bash
@@ -27,8 +26,10 @@ bs-shop
 bugfix
 bun-init
 chrome-autocopy
+chrome-autofill
+chrome-fill-form
 chrome-image
-chrome-svg-copy
+chrome-tabs-copy
 chrome-wp-admin
 CleanCode
 cod4
@@ -58,7 +59,6 @@ Eventidy
 example-app
 extramed
 fastify-server-for-lazy-developers
-fill-form
 fin-collect.loc
 flex-site.loc
 flex-slider
@@ -88,6 +88,7 @@ h-diber
 h-test
 html-art
 html-bazzo
+html-bunavestire
 html-bunavestire
 html-gsap
 html-hydra-valves
@@ -341,8 +342,6 @@ strapi_segalerba
 stroi-invest.loc
 StyleTour
 sublime
-svg-copier-chrome-extension
-tabs-copy
 test
 test-altuofianco-shop
 test-git

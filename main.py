@@ -11,6 +11,8 @@ from classes.GithubCloneRepo import GithubCloneRepo
 from classes.GithubCreateRepoOnGithub import GithubCreateRepoOnGithub
 from classes.GithubDeleteRepo import GithubDeleteRepo
 from classes.GithubDeleteRepos import GithubDeleteRepos
+from classes.GithubRenameRepo import GithubRenameRepo
+from classes.GithubRenameRepoFromCwd import GithubRenameRepoFromCwd
 from classes.GithubReposToFile import GithubReposToFile
 from utils import pretty_table
 from views import set_origin_url_bitbucket
@@ -34,7 +36,9 @@ def menu():
         ["12", "[red]Delete mutliple repos on github"],
         ["13", "[green]From bitbucket to github"],
         ["14", "[green]From github to bitbucket"],
-        ["15", "[red]Exit"],
+        ["15", "[green]Rename repo on github"],
+        ["16", "[green]Rename repo from current folder (auto set-url)"],
+        ["17", "[red]Exit"],
     ]
     pretty_table(table_header, table_columns, table_rows)
 
@@ -80,6 +84,12 @@ def menu():
     elif choice == "14":
         GithubToBitbucket()
         BitbucketReposToFile()
+    elif choice == "15":
+        GithubRenameRepo()
+        GithubReposToFile()
+    elif choice == "16":
+        GithubRenameRepoFromCwd()
+        GithubReposToFile()
     else:
         print("[red]Exiting the program...")
         exit(0)
