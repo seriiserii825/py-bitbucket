@@ -29,6 +29,7 @@ chrome-autocopy
 chrome-autofill
 chrome-fill-form
 chrome-image
+chrome-svg-copy
 chrome-tabs-copy
 chrome-wp-admin
 CleanCode
@@ -88,7 +89,6 @@ h-diber
 h-test
 html-art
 html-bazzo
-html-bunavestire
 html-bunavestire
 html-gsap
 html-hydra-valves
