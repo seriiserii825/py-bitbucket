@@ -363,7 +363,6 @@ bs-industrial-project,sites-bludelego
 bs-biesseclean,sites-bludelego
 lm-onyma,sites-bludelego
 bs-palazzetti-ortofrutta,sites-bludelego
-oneair,oneair
 rewind-ios,blueline-ios
 test,blueline-ios
 conte_ios,blueline-ios
@@ -530,3 +529,5 @@ ag-aurora-php,blueline-wordpress-sites
 radu-aurora-php,blueline-wordpress-sites
 nuxt-sergiu-challenge,blueline-wordpress-sites
 ag-backend-challenge,blueline-wordpress-sites
+bs-web-academy,blueline-wordpress-sites
+nuxt-pdf-generator,nuxt-projects
