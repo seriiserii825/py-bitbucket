@@ -111,11 +111,7 @@ class Bitbucket:
         return ac.choose_account_by_email()
 
     def _get_workspaces_from_api(self, account: AccountType) -> List[str]:
-        ba = BitbucketApi(
-            username=account.username,
-            app_password=account.app_password,
-        )
-        return ba.fetch_workspace_list()
+        return [account.workspace]
 
     def _get_repos_by_workspace(self, workspace, account) -> List[RepoType]:
         ba = BitbucketApi(
