@@ -8,3 +8,4 @@ class AccountType(NamedTuple):
     username: str
     app_password: str
     is_private: str
+    workspaces: str = ""

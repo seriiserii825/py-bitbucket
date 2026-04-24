@@ -31,6 +31,7 @@ class AccountsCsv:
                     username=row["username"],
                     app_password=row["app_password"],
                     is_private=row["is_private"],
+                    workspaces=row.get("workspaces", ""),
                 )
                 rows.append(account)
         return rows

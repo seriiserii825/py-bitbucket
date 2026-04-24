@@ -111,6 +111,8 @@ class Bitbucket:
         return ac.choose_account_by_email()
 
     def _get_workspaces_from_api(self, account: AccountType) -> List[str]:
+        if account.workspaces:
+            return [w.strip() for w in account.workspaces.split("|") if w.strip()]
         return [account.workspace]
 
     def _get_repos_by_workspace(self, workspace, account) -> List[RepoType]:
