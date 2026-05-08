@@ -24,7 +24,6 @@ class BitbucketPlaywrightCreateRepo:
             pw.close()
 
     def _set_repo_name(self) -> str:
-        pretty_print(f"[DEBUG] _set_repo_name: self.name='{self.name}' (type: {type(self.name)})")
         if self.name:
             pretty_print(f"Repo name: {self.name}")
             return self.name

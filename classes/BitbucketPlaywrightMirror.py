@@ -13,14 +13,8 @@ class BitbucketPlaywrightMirror:
 
     def start(self):
         repo_name, _ = self._clone_mirror_from_bitbucket()
-        pretty_print(
-            f"[DEBUG] repo_name after clone: '{repo_name}' (type: {type(repo_name)})"
-        )
         self._cd_cloned_repo(repo_name)
 
-        pretty_print(
-            f"[DEBUG] passing name='{repo_name}' to BitbucketPlaywrightCreateRepo"
-        )
         creator = BitbucketPlaywrightCreateRepo(name=repo_name)
         self._push_to_new_repo(repo_name, creator.workspace)
 
