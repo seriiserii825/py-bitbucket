@@ -55,3 +55,4 @@ venv/
 docs/_build/
 githubData.py
 accounts.csv
+session.json
