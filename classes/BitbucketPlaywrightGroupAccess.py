@@ -21,13 +21,16 @@ class BitbucketPlaywrightGroupAccess:
         self.page.wait_for_selector('[role="dialog"]', state="visible")
 
         self._select_write_permission()
-        pretty_print("Write selected. Fill in the group and confirm in the browser.")
+        pretty_print("Write selected. Fill in the group and click Confirm in the browser.")
+        input("Press Enter to close browser...")
 
     def _select_write_permission(self):
-        trigger = self.page.locator('[data-testid="privilegesDropdown--trigger"]')
+        trigger = self.page.locator(
+            '[data-testid="modal-dialog--body"] [data-testid="privilegesDropdown--trigger"]'
+        )
         trigger.click()
         self.page.wait_for_selector(
-            '[data-testid="privilegesDropdown--trigger"][aria-expanded="true"]'
+            '[data-testid="modal-dialog--body"] [data-testid="privilegesDropdown--trigger"][aria-expanded="true"]'
         )
         self.page.locator('button[role="menuitem"]').filter(
             has=self.page.locator('span[data-item-title="true"]', has_text="Write")

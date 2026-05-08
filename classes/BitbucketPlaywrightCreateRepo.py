@@ -40,12 +40,10 @@ class BitbucketPlaywrightCreateRepo:
 
         self._fill_repo_name(page, repo_name)
 
-        input("Form filled. Press Enter to submit...")
         page.click('button[type="submit"]')
         page.wait_for_url(f"**/{repo_name}/**", timeout=15000)
         pretty_print(f"Repository '{repo_name}' created successfully!")
         BitbucketPlaywrightGroupAccess(page, workspace, repo_name)
-        input("Press Enter to close browser...")
 
     def _fill_repo_name(self, page: Page, repo_name: str):
         page.fill("input#id_name", repo_name)
