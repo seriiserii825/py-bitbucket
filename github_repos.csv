@@ -280,6 +280,7 @@ py-parser
 py-parsing
 py-password
 py-ping-pong
+py-playwright
 py-pomodoro
 py-private
 py-quiz
