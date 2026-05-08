@@ -6,26 +6,36 @@ from utils import pretty_print, selectOne
 
 
 class BitbucketPlaywrightCreateRepo:
-    def __init__(self):
+    def __init__(self, name: str | None = None, workspace: str | None = None):
+        self.name = name
+        self._preset_workspace = workspace
+        self.workspace: str = ""
         self.start()
 
     def start(self):
         repo_name = self._set_repo_name()
-        workspace = self._select_workspace()
+        self.workspace = self._select_workspace()
 
         pw = BitbucketPlaywright()
         try:
             pw.ensure_logged_in()
-            self._create_repo(pw.page, workspace, repo_name)
+            self._create_repo(pw.page, self.workspace, repo_name)
         finally:
             pw.close()
 
     def _set_repo_name(self) -> str:
+        pretty_print(f"[DEBUG] _set_repo_name: self.name='{self.name}' (type: {type(self.name)})")
+        if self.name:
+            pretty_print(f"Repo name: {self.name}")
+            return self.name
         pretty_print("Set repo name")
         bb = Bitbucket()
         return bb.set_repo_name()
 
     def _select_workspace(self) -> str:
+        if self._preset_workspace:
+            pretty_print(f"Workspace: {self._preset_workspace}")
+            return self._preset_workspace
         pretty_print("Select workspace")
         bb = Bitbucket()
         return bb.select_workspace()

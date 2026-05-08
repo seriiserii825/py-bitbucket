@@ -5,6 +5,7 @@ from classes.BitbucketDeleteRepo import BitbucketDeleteRepo
 from classes.BitbucketDeleteRepos import BitbucketDeleteRepos
 from classes.BitbucketFindRepoInFile import BitbucketFindRepoInFile
 from classes.BitbucketMirror import BitbucketMirror
+from classes.BitbucketPlaywrightMirror import BitbucketPlaywrightMirror
 from classes.BitbucketPlaywrightCreateRepo import BitbucketPlaywrightCreateRepo
 from classes.BitbucketReposToFile import BitbucketReposToFile
 from classes.BitbucketToGithub import BitbucketToGithub
@@ -50,7 +51,7 @@ def menu():
         BitbucketReposToFile()
         menu()
     elif choice == "2":
-        BitbucketMirror()
+        BitbucketPlaywrightMirror()
         BitbucketReposToFile()
     elif choice == "3":
         BitbucketFindRepoInFile()
