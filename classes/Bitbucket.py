@@ -183,8 +183,11 @@ class Bitbucket:
 
     def _get_workspaces_from_file(self) -> List[str]:
         repos = self._get_repos_from_file()
-        workspaces = set(repo.workspace for repo in repos)
-        return list(workspaces)
+        workspaces = sorted(set(repo.workspace for repo in repos))
+        if "blueline-wordpress-sites" in workspaces:
+            workspaces.remove("blueline-wordpress-sites")
+            workspaces.insert(0, "blueline-wordpress-sites")
+        return workspaces
 
     def select_workspace(self) -> str:
         workspaces = self._get_workspaces_from_file()
