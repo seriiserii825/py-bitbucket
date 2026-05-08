@@ -149,6 +149,16 @@ class Bitbucket:
             workspace=selected_repo[0].split("/")[1],
         )
 
+    def get_repos_from_file_multiple(self) -> List[RepoType]:
+        repos = self._get_repos_from_file()
+        sorted_repos = sorted(repos, key=lambda x: (x.workspace, x.name))
+        repos_for_fzf = [f"{repo.name}/{repo.workspace}" for repo in sorted_repos]
+        selected = fzf.prompt(repos_for_fzf, "--multi")
+        return [
+            RepoType(name=s.split("/")[0], workspace=s.split("/")[1])
+            for s in selected
+        ]
+
     def find_repo_in_file(self):
         repo_name = input("Enter the repository name to search: ")
         if not repo_name:
