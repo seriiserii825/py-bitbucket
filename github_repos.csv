@@ -24,6 +24,7 @@ bs-bunavestire
 bs-modena
 bs-shop
 bs-test
+bs-vimium-c
 bugfix
 bun-init
 chrome-autocopy
@@ -376,6 +377,7 @@ VanillaJS
 venevsky.loc
 vim-golf
 vim-macros
+vimium-c
 vimrc
 visual-studio
 vite-macservice
