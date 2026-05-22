@@ -15,6 +15,8 @@ from classes.GithubCreateRepoOnGithub import GithubCreateRepoOnGithub
 from classes.GithubDeleteRepo import GithubDeleteRepo
 from classes.GithubDeleteRepos import GithubDeleteRepos
 from classes.GithubRenameRepo import GithubRenameRepo
+from classes.BitbucketCopyRemoteUrl import BitbucketCopyRemoteUrl
+from classes.GithubCopyRemoteUrl import GithubCopyRemoteUrl
 from classes.GithubRenameRepoFromCwd import GithubRenameRepoFromCwd
 from classes.GithubReposToFile import GithubReposToFile
 from utils import pretty_table
@@ -33,16 +35,18 @@ def menu():
         ["6", "[red]Delete multiple repos on bitbucket"],
         ["7", "[blue]Clone repo on bitbucket"],
         ["8", "[blue]Set and push new origin bitbucket"],
-        ["9", "[green]From github to csv"],
-        ["10", "[green]Create repo on github"],
-        ["11", "[green]Clone from github"],
-        ["12", "[red]Delete repo on github"],
-        ["13", "[red]Delete mutliple repos on github"],
-        ["14", "[green]From bitbucket to github"],
-        ["15", "[green]From github to bitbucket"],
-        ["16", "[green]Rename repo on github"],
-        ["17", "[green]Rename repo from current folder (auto set-url)"],
-        ["18", "[red]Exit"],
+        ["9", "[blue]Copy Bitbucket remote URL to clipboard"],
+        ["10", "[green]From github to csv"],
+        ["11", "[green]Create repo on github"],
+        ["12", "[green]Clone from github"],
+        ["13", "[red]Delete repo on github"],
+        ["14", "[red]Delete mutliple repos on github"],
+        ["15", "[green]From bitbucket to github"],
+        ["16", "[green]From github to bitbucket"],
+        ["17", "[green]Rename repo on github"],
+        ["18", "[green]Rename repo from current folder (auto set-url)"],
+        ["19", "[green]Copy GitHub remote URL to clipboard"],
+        ["20", "[red]Exit"],
     ]
     pretty_table(table_header, table_columns, table_rows)
 
@@ -74,30 +78,36 @@ def menu():
     elif choice == "8":
         set_origin_url_bitbucket()
     elif choice == "9":
-        GithubReposToFile()
+        BitbucketCopyRemoteUrl()
+        menu()
     elif choice == "10":
-        GithubCreateRepoOnGithub()
         GithubReposToFile()
     elif choice == "11":
-        GithubCloneRepo()
+        GithubCreateRepoOnGithub()
+        GithubReposToFile()
     elif choice == "12":
+        GithubCloneRepo()
+    elif choice == "13":
         GithubDeleteRepo()
         GithubReposToFile()
-    elif choice == "13":
+    elif choice == "14":
         GithubDeleteRepos()
         GithubReposToFile()
-    elif choice == "14":
+    elif choice == "15":
         BitbucketToGithub()
         GithubReposToFile()
-    elif choice == "15":
+    elif choice == "16":
         GithubToBitbucket()
         BitbucketReposToFile()
-    elif choice == "16":
+    elif choice == "17":
         GithubRenameRepo()
         GithubReposToFile()
-    elif choice == "17":
+    elif choice == "18":
         GithubRenameRepoFromCwd()
         GithubReposToFile()
+    elif choice == "19":
+        GithubCopyRemoteUrl()
+        menu()
     else:
         print("[red]Exiting the program...")
         exit(0)

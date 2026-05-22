@@ -24,15 +24,18 @@ bs-bunavestire
 bs-modena
 bs-shop
 bs-test
-bs-vimium-c
 bugfix
 bun-init
 chrome-autocopy
 chrome-autofill
 chrome-fill-form
+<<<<<<< Updated upstream
 chrome-image
+=======
+>>>>>>> Stashed changes
 chrome-svg-copy
 chrome-tabs-copy
+chrome-vimium-c
 chrome-wp-admin
 CleanCode
 cod4
@@ -62,6 +65,7 @@ Eventidy
 example-app
 extramed
 fastify-server-for-lazy-developers
+fcep-pdf-quiz
 fin-collect.loc
 flex-site.loc
 flex-slider
