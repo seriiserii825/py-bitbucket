@@ -29,10 +29,6 @@ bun-init
 chrome-autocopy
 chrome-autofill
 chrome-fill-form
-<<<<<<< Updated upstream
-chrome-image
-=======
->>>>>>> Stashed changes
 chrome-svg-copy
 chrome-tabs-copy
 chrome-vimium-c
