@@ -30,6 +30,7 @@ chrome-autocopy
 chrome-autofill
 chrome-fill-form
 chrome-svg-copy
+chrome-sync-resolution
 chrome-tabs-copy
 chrome-vimium-c
 chrome-wp-admin
@@ -277,6 +278,7 @@ py-oop
 py-oop-coffee-machine
 py-openweather
 py-pacman
+py-paris
 py-parser
 py-parsing
 py-password
