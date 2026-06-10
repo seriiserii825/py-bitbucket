@@ -14,7 +14,7 @@ class BitbucketDeleteRepos:
         if not repos:
             return
         account = AccountsCsv().choose_account_by_email()
-        bb_api = BitbucketApi(account.username, account.app_password)
+        bb_api = BitbucketApi(account.email, account.api_token)
         for repo in repos:
             self._delete_repo(bb_api, repo.name, repo.workspace)
 

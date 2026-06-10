@@ -7,11 +7,11 @@ from utils import pretty_print
 
 
 class BitbucketApi:
-    def __init__(self, username, app_password):
+    def __init__(self, email, api_token):
         self.workspace = ""
-        self.username = username
-        self.app_password = app_password
-        self.auth = HTTPBasicAuth(self.username, self.app_password)
+        self.email = email
+        self.api_token = api_token
+        self.auth = HTTPBasicAuth(self.email, self.api_token)
 
     def fetch_workspace_list(self):
         url = "https://api.bitbucket.org/2.0/workspaces"

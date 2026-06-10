@@ -6,6 +6,6 @@ class AccountType(NamedTuple):
     workspace: str
     project_key: str
     username: str
-    app_password: str
+    api_token: str
     is_private: str
     workspaces: str = ""

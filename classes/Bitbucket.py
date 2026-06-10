@@ -117,8 +117,8 @@ class Bitbucket:
 
     def _get_repos_by_workspace(self, workspace, account) -> List[RepoType]:
         ba = BitbucketApi(
-            username=account.username,
-            app_password=account.app_password,
+            email=account.email,
+            api_token=account.api_token,
         )
         return ba.fetch_workspace_repos(workspace)
 
@@ -220,7 +220,7 @@ class Bitbucket:
 
         account = self._choose_account_by_email()
         project_key = account.project_key
-        bb_api = BitbucketApi(account.username, account.app_password)
+        bb_api = BitbucketApi(account.email, account.api_token)
 
         new_repo = bb_api._createRepoOnBitbucketApi(
             workspace=workspace, project_key=project_key, repo_name=repo_name

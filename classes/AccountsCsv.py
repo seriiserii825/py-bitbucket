@@ -29,7 +29,7 @@ class AccountsCsv:
                     workspace=row["workspace"],
                     project_key=row["project_key"],
                     username=row["username"],
-                    app_password=row["app_password"],
+                    api_token=row["api_token"],
                     is_private=row["is_private"],
                     workspaces=row.get("workspaces", ""),
                 )
@@ -51,7 +51,7 @@ class AccountsCsv:
             "Workspace",
             "Project Key",
             "Username",
-            "App Password",
+            "API Token",
             "Is Private",
         ]
         table_rows = [
@@ -59,7 +59,7 @@ class AccountsCsv:
             account.workspace,
             account.project_key,
             account.username,
-            account.app_password,
+            account.api_token,
             str(account.is_private),
         ]
         if account:

@@ -56,7 +56,7 @@ class GithubToBitbucket:
     def _create_repo_on_bitbucket(self, repo_name: str, workspace: str):
         ac = AccountsCsv()
         account = ac.choose_account_by_email()
-        bb_api = BitbucketApi(account.username, account.app_password)
+        bb_api = BitbucketApi(account.email, account.api_token)
         response = bb_api._createRepoOnBitbucketApi(
             workspace=workspace,
             project_key=account.project_key,
