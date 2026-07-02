@@ -30,6 +30,7 @@ chrome-autocopy
 chrome-autofill
 chrome-fill-form
 chrome-graphql-export
+chrome-open-wp-editor-page
 chrome-svg-copy
 chrome-tabs-copy
 chrome-vimium-c
@@ -45,6 +46,7 @@ d-modena
 design-group.loc
 dev-environment-files
 django
+doc-garda
 docker-course
 docker-laravel-nginx
 docker-python-mongo
