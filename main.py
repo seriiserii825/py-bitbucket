@@ -23,6 +23,19 @@ from utils import pretty_table
 from views import set_origin_url_bitbucket
 
 
+def confirm_repo_already_created(destination: str, create_option: str) -> bool:
+    print(f"[yellow]Have you already created the new repo on {destination}?")
+    print(
+        f"[yellow]You can create a repo on {destination} from this script "
+        f"(option {create_option} in the main menu)."
+    )
+    answer = input("Continue with migration? (y/n): ").strip().lower()
+    if answer == "y":
+        return True
+    print(f"[yellow]Redirecting to the main menu so you can create the repo on {destination} first...")
+    return False
+
+
 def menu():
     table_header = "Choose an option"
     table_columns = ["Index", "Option"]
@@ -94,11 +107,17 @@ def menu():
         GithubDeleteRepos()
         GithubReposToFile()
     elif choice == "15":
-        BitbucketToGithub()
-        GithubReposToFile()
+        if confirm_repo_already_created("GitHub", "11"):
+            BitbucketToGithub()
+            GithubReposToFile()
+        else:
+            menu()
     elif choice == "16":
-        GithubToBitbucket()
-        BitbucketReposToFile()
+        if confirm_repo_already_created("Bitbucket", "4"):
+            GithubToBitbucket()
+            BitbucketReposToFile()
+        else:
+            menu()
     elif choice == "17":
         GithubRenameRepo()
         GithubReposToFile()
