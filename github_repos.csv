@@ -29,6 +29,7 @@ bun-init
 chrome-autocopy
 chrome-autofill
 chrome-fill-form
+chrome-generate-image-on-new-tab
 chrome-graphql-export
 chrome-open-wp-editor-page
 chrome-svg-copy
