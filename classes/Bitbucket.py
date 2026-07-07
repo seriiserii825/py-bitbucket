@@ -63,33 +63,6 @@ class Bitbucket:
     def _choose_account_by_email(self) -> AccountType:
         return self._get_account_from_file()
 
-    def set_new_origin(self) -> None:
-        pass
-        # repo_name = repo_from_file.split("/")[0]
-        # workspace = repo_from_file.split("/")[1]
-        # remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
-        # set_url_cmd = ["git", "remote", "set-url", "origin", remote_url]
-        # try:
-        #     subprocess.run(set_url_cmd, check=True)
-        # except subprocess.CalledProcessError as e:
-        #     raise BitbucketException(
-        #         f"Failed to set new origin URL: {e}"
-        #     ) from e
-        # try:
-        #     self.push_origin_force(workspace, repo_name)
-        # except BitbucketException as e:
-        #     raise BitbucketException(
-        #         f"Failed to push to origin after setting new URL: {e}"
-        #     ) from e
-
-    def push_origin_force(self, workspace: str, repo_name: str) -> None:
-        remote_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
-        push_cmd = ["git", "push -u", "origin main", "--force", remote_url]
-        try:
-            subprocess.run(push_cmd, check=True, shell=True)
-        except subprocess.CalledProcessError as e:
-            raise BitbucketException(f"Failed to push to origin: {e}") from e
-
     def push_to_mirror_repo(self, repo_name: str, workspace: str) -> None:
         repo_url = f"git@bitbucket.org:{workspace}/{repo_name}.git"
         command = f"git push --mirror {repo_url}"
