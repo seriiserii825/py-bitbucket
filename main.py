@@ -56,7 +56,7 @@ def menu():
         ["15", "[green]From github to bitbucket"],
         ["16", "[green]Rename repo on github"],
         ["17", "[green]Rename repo from current folder (auto set-url)"],
-        ["18", "[green]Copy GitHub remote URL to clipboard"],
+        ["18", "[green]Copy/set/add remote origin URL (GitHub) to clipboard"],
         ["19", "[red]Exit"],
     ]
     pretty_table(table_header, table_columns, table_rows)
