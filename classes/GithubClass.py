@@ -267,32 +267,6 @@ class GithubClass:
             raise GithubException("No repositories found in the file.")
         return fzf.prompt(repos)
 
-    def rename_repo(self):
-        pretty_print("Renaming a repository on GitHub...")
-        token = self._get_data_from_env("GITHUB_TOKEN")
-        username = self._get_data_from_env("GITHUB_USERNAME")
-
-        repos = self._get_repos_from_file()
-        repo_name = fzf.prompt(repos)[0]
-
-        new_name = input(f"Enter new name for '{repo_name}': ").strip()
-        if not new_name:
-            raise GithubException("New repository name cannot be empty.")
-
-        url = f"https://api.github.com/repos/{username}/{repo_name}"
-        headers = {"Accept": "application/vnd.github.v3+json"}
-        response = requests.patch(url, json={"name": new_name}, auth=(username, token), headers=headers)
-
-        if response.status_code == 200:
-            print(f"✅ Repository '{repo_name}' renamed to '{new_name}' successfully.")
-        elif response.status_code == 404:
-            raise GithubException("Repository not found or insufficient permissions.")
-        else:
-            raise GithubException(
-                f"Failed to rename repository: {response.status_code} "
-                f"- {response.json().get('message', 'Unknown error')}"
-            )
-
     def rename_repo_from_cwd(self):
         pretty_print("Renaming repository from current folder...")
         token = self._get_data_from_env("GITHUB_TOKEN")
@@ -309,6 +283,15 @@ class GithubClass:
         remote_url = result.stdout.strip()
         # supports both SSH (git@github.com:user/repo.git) and HTTPS
         repo_name = remote_url.rstrip("/").rstrip(".git").split("/")[-1].replace(".git", "")
+
+        current_dir = os.getcwd()
+        folder_name = os.path.basename(current_dir)
+        if folder_name != repo_name:
+            raise GithubException(
+                f"Current folder name '{folder_name}' does not match "
+                f"the GitHub repository name '{repo_name}'. "
+                "Make sure you are running this from the correct repo folder."
+            )
         pretty_print(f"Current repo: {repo_name}")
 
         new_name = input(f"Enter new name for '{repo_name}': ").strip()
@@ -337,6 +320,14 @@ class GithubClass:
 
         subprocess.run(["git", "remote", "set-url", "origin", new_remote_url], check=True)
         print(f"🔗 Remote updated to: {new_remote_url}")
+
+        # rename the local folder to match the new repo name and leave it,
+        # since the folder we were in no longer exists under its old name
+        parent_dir = os.path.dirname(current_dir)
+        new_dir = os.path.join(parent_dir, new_name)
+        os.chdir(parent_dir)
+        os.rename(current_dir, new_dir)
+        print(f"📁 Local folder renamed to: {new_dir}")
 
     def check_repo_on_github(self, repo_name: str) -> bool:
         repos = self._get_repos_from_file()

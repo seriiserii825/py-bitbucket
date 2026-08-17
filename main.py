@@ -14,7 +14,6 @@ from classes.GithubCloneRepo import GithubCloneRepo
 from classes.GithubCreateRepoOnGithub import GithubCreateRepoOnGithub
 from classes.GithubDeleteRepo import GithubDeleteRepo
 from classes.GithubDeleteRepos import GithubDeleteRepos
-from classes.GithubRenameRepo import GithubRenameRepo
 from classes.BitbucketCopyRemoteUrl import BitbucketCopyRemoteUrl
 from classes.GithubCopyRemoteUrl import GithubCopyRemoteUrl
 from classes.GithubRenameRepoFromCwd import GithubRenameRepoFromCwd
@@ -54,10 +53,9 @@ def menu():
         ["13", "[red]Delete mutliple repos on github"],
         ["14", "[green]From bitbucket to github"],
         ["15", "[green]From github to bitbucket"],
-        ["16", "[green]Rename repo on github"],
-        ["17", "[green]Rename repo from current folder (auto set-url)"],
-        ["18", "[green]Copy/set/add remote origin URL (GitHub) to clipboard"],
-        ["19", "[red]Exit"],
+        ["16", "[green]Rename repo on github (from current folder, checks folder matches repo)"],
+        ["17", "[green]Copy/set/add remote origin URL (GitHub) to clipboard"],
+        ["18", "[red]Exit"],
     ]
     pretty_table(table_header, table_columns, table_rows)
 
@@ -115,12 +113,9 @@ def menu():
         else:
             menu()
     elif choice == "16":
-        GithubRenameRepo()
-        GithubReposToFile()
-    elif choice == "17":
         GithubRenameRepoFromCwd()
         GithubReposToFile()
-    elif choice == "18":
+    elif choice == "17":
         GithubCopyRemoteUrl()
         menu()
     else:
