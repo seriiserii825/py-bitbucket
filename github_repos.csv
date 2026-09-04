@@ -28,6 +28,7 @@ bugfix
 bun-init
 chrome-autocopy
 chrome-autofill
+chrome-figma-copy
 chrome-fill-form
 chrome-generate-image-on-new-tab
 chrome-graphql-export
