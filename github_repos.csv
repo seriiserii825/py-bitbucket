@@ -23,7 +23,6 @@ bs-api
 bs-bunavestire
 bs-modena
 bs-shop
-bs-test
 bugfix
 bun-init
 chrome-autocopy
@@ -93,7 +92,6 @@ gulp
 gulp-webpack
 gulp-wp
 h-diber
-h-test
 html-art
 html-bazzo
 html-bunavestire
@@ -187,7 +185,6 @@ nest-tea-stream
 nest-teashop
 nest-teashop-angular
 nest_teashop
-new-test
 next-auth
 next-blog
 next-course
@@ -295,7 +292,6 @@ py-scss
 py-smtp-email
 py-snake-game
 py-sync-settings
-py-test
 py-turtle
 py-turtle-race
 py-usa
@@ -357,9 +353,9 @@ stroi-invest.loc
 StyleTour
 sublime
 Surfingkeys
-test
+test-2
+test-3
 test-altuofianco-shop
-test-git
 time-app
 tinacms.org
 tkachev.loc
