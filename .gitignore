@@ -56,3 +56,6 @@ docs/_build/
 githubData.py
 accounts.csv
 session.json
+accounts.csv.sha256
+.env.sha256
+session.json.sha256
