@@ -1,6 +1,7 @@
-import csv
 import os
 from typing import List
+
+from py_libs.CsvFile import CsvFile
 
 from execeptions.AccountException import AccountException
 from my_types.account_type import AccountType
@@ -20,21 +21,19 @@ class AccountsCsv:
     def _from_file_to_array(self) -> List[AccountType]:
         if not os.path.exists(self.file_path):
             raise AccountException(f"File {self.file_path} does not exist.")
-        rows = []
-        with open(self.file_path, newline="") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                account = AccountType(
-                    email=row["email"],
-                    workspace=row["workspace"],
-                    project_key=row["project_key"],
-                    username=row["username"],
-                    api_token=row["api_token"],
-                    is_private=row["is_private"],
-                    workspaces=row.get("workspaces", ""),
-                )
-                rows.append(account)
-        return rows
+        rows = CsvFile(self.file_path).read_csv() or []
+        return [
+            AccountType(
+                email=row["email"],
+                workspace=row["workspace"],
+                project_key=row["project_key"],
+                username=row["username"],
+                api_token=row["api_token"],
+                is_private=row["is_private"],
+                workspaces=row.get("workspaces", ""),
+            )
+            for row in rows
+        ]
 
     def get_account_by_email(self, email) -> AccountType:
         accounts = self._from_file_to_array()

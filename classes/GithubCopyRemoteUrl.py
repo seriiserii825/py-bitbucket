@@ -1,6 +1,5 @@
 from classes.GithubClass import GithubClass
-from classes.Clipboard import ClipboardManager
-from classes.Notification import Notification
+from py_libs.Clipboard import Clipboard
 from execeptions.GithubException import GithubException
 from utils import pretty_print, selectOne
 
@@ -21,8 +20,7 @@ class GithubCopyRemoteUrl:
             else:
                 subcommand = "set-url" if action == "set" else "add"
                 clipboard_text = f"git remote {subcommand} origin {remote_url}"
-            ClipboardManager.write(clipboard_text)
-            Notification.notify("Copied to clipboard", clipboard_text)
+            Clipboard.write(clipboard_text)
             pretty_print(f"Copied to clipboard: {clipboard_text}")
         except GithubException as e:
             pretty_print(f"Error: {e}", error=True)
