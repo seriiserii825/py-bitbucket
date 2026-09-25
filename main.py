@@ -18,7 +18,7 @@ from classes.BitbucketCopyRemoteUrl import BitbucketCopyRemoteUrl
 from classes.GithubCopyRemoteUrl import GithubCopyRemoteUrl
 from classes.GithubRenameRepoFromCwd import GithubRenameRepoFromCwd
 from classes.GithubReposToFile import GithubReposToFile
-from utils import pretty_table
+from py_libs.Select import Select
 
 
 def confirm_repo_already_created(destination: str, create_option: str) -> bool:
@@ -34,93 +34,66 @@ def confirm_repo_already_created(destination: str, create_option: str) -> bool:
     return False
 
 
-def menu():
-    table_header = "Choose an option"
-    table_columns = ["Index", "Option"]
-    table_rows = [
-        ["1", "[blue]Bitbucket repos to File"],
-        ["2", "[blue]Clone and Mirror Bitbucket Repo to Bitbucket"],
-        ["3", "[blue]Find Repo in bitbucket File"],
-        ["4", "[blue]Create new repo on bitbucket"],
-        ["5", "[blue]Delete repo on bitbucket"],
-        ["6", "[red]Delete multiple repos on bitbucket"],
-        ["7", "[blue]Clone repo on bitbucket"],
-        ["8", "[blue]Copy/set/add remote origin URL (Bitbucket) to clipboard"],
-        ["9", "[green]From github to csv"],
-        ["10", "[green]Create repo on github"],
-        ["11", "[green]Clone from github"],
-        ["12", "[red]Delete repo on github"],
-        ["13", "[red]Delete mutliple repos on github"],
-        ["14", "[green]From bitbucket to github"],
-        ["15", "[green]From github to bitbucket"],
-        ["16", "[green]Rename repo on github (from current folder, checks folder matches repo)"],
-        ["17", "[green]Copy/set/add remote origin URL (GitHub) to clipboard"],
-        ["18", "[red]Exit"],
-    ]
-    pretty_table(table_header, table_columns, table_rows)
-
-    choice = input("Enter your choice: ")
-    if choice == "1":
-        BitbucketReposToFile()
-        menu()
-    elif choice == "2":
-        BitbucketPlaywrightMirror()
-        BitbucketReposToFile()
-    elif choice == "3":
-        BitbucketFindRepoInFile()
-        menu()
-    elif choice == "3":
-        BitbucketFindRepoInFile()
-        menu()
-    elif choice == "4":
-        # BitbucketCreateRepo()
-        BitbucketPlaywrightCreateRepo()
-        BitbucketReposToFile()
-    elif choice == "5":
-        BitbucketDeleteRepo()
-        BitbucketReposToFile()
-    elif choice == "6":
-        BitbucketDeleteRepos()
-        BitbucketReposToFile()
-    elif choice == "7":
-        BitbucketClone()
-    elif choice == "8":
-        BitbucketCopyRemoteUrl()
-        menu()
-    elif choice == "9":
+def migrate_to_github():
+    if confirm_repo_already_created("GitHub", "Create repo on github"):
+        BitbucketToGithub()
         GithubReposToFile()
-    elif choice == "10":
-        GithubCreateRepoOnGithub()
-        GithubReposToFile()
-    elif choice == "11":
-        GithubCloneRepo()
-    elif choice == "12":
-        GithubDeleteRepo()
-        GithubReposToFile()
-    elif choice == "13":
-        GithubDeleteRepos()
-        GithubReposToFile()
-    elif choice == "14":
-        if confirm_repo_already_created("GitHub", "10"):
-            BitbucketToGithub()
-            GithubReposToFile()
-        else:
-            menu()
-    elif choice == "15":
-        if confirm_repo_already_created("Bitbucket", "4"):
-            GithubToBitbucket()
-            BitbucketReposToFile()
-        else:
-            menu()
-    elif choice == "16":
-        GithubRenameRepoFromCwd()
-        GithubReposToFile()
-    elif choice == "17":
-        GithubCopyRemoteUrl()
-        menu()
     else:
+        menu()
+
+
+def migrate_to_bitbucket():
+    if confirm_repo_already_created("Bitbucket", "Create new repo on bitbucket"):
+        GithubToBitbucket()
+        BitbucketReposToFile()
+    else:
+        menu()
+
+
+def menu():
+    # (label, action, return to menu after action)
+    options = [
+        ("Bitbucket repos to File", BitbucketReposToFile, True),
+        ("Clone and Mirror Bitbucket Repo to Bitbucket",
+         lambda: (BitbucketPlaywrightMirror(), BitbucketReposToFile()), False),
+        ("Find Repo in bitbucket File", BitbucketFindRepoInFile, True),
+        ("Create new repo on bitbucket",
+         lambda: (BitbucketPlaywrightCreateRepo(), BitbucketReposToFile()), False),
+        ("Delete repo on bitbucket",
+         lambda: (BitbucketDeleteRepo(), BitbucketReposToFile()), False),
+        ("Delete multiple repos on bitbucket",
+         lambda: (BitbucketDeleteRepos(), BitbucketReposToFile()), False),
+        ("Clone repo on bitbucket", BitbucketClone, False),
+        ("Copy/set/add remote origin URL (Bitbucket) to clipboard",
+         BitbucketCopyRemoteUrl, True),
+        ("From github to csv", GithubReposToFile, False),
+        ("Create repo on github",
+         lambda: (GithubCreateRepoOnGithub(), GithubReposToFile()), False),
+        ("Clone from github", GithubCloneRepo, False),
+        ("Delete repo on github",
+         lambda: (GithubDeleteRepo(), GithubReposToFile()), False),
+        ("Delete mutliple repos on github",
+         lambda: (GithubDeleteRepos(), GithubReposToFile()), False),
+        ("From bitbucket to github", migrate_to_github, False),
+        ("From github to bitbucket", migrate_to_bitbucket, False),
+        ("Rename repo on github (from current folder, checks folder matches repo)",
+         lambda: (GithubRenameRepoFromCwd(), GithubReposToFile()), False),
+        ("Copy/set/add remote origin URL (GitHub) to clipboard",
+         GithubCopyRemoteUrl, True),
+        ("Exit", None, False),
+    ]
+    labels = [label for label, _, _ in options]
+    choice = Select.select_fzf_one(labels)
+    if choice is None or choice not in labels:
         print("[red]Exiting the program...")
         exit(0)
+    _, action, back_to_menu = options[labels.index(choice)]
+    if action is None:
+        print("[red]Exiting the program...")
+        exit(0)
+    action()
+    if back_to_menu:
+        menu()
 
 
 if __name__ == "__main__":
