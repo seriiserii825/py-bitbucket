@@ -111,6 +111,23 @@ class ForgejoClass:
             rows.append([t["name"], t.get("permission", ""), repos_text, t.get("description", "")])
         pretty_table(f"Teams in {org}", ["Name", "Permission", "Repos", "Description"], rows)
 
+    def list_team_repos(self):
+        org = self.select_org()
+        teams = self.get_teams(org)
+        if not teams:
+            raise ForgejoException(f"No teams found in '{org}'.")
+        names = [t["name"] for t in teams]
+        team = teams[names.index(selectOne(names))]
+        if team.get("includes_all_repositories"):
+            repos = self._get_paginated(f"/orgs/{org}/repos", "list organization repositories")
+        else:
+            repos = self._get_paginated(f"/teams/{team['id']}/repos", f"list repos of team {team['name']}")
+        rows = [
+            [r["full_name"], "private" if r.get("private") else "public", r.get("ssh_url", "")]
+            for r in sorted(repos, key=lambda r: r["full_name"])
+        ]
+        pretty_table(f"Repos of team '{team['name']}' ({len(rows)})", ["Repo", "Visibility", "SSH"], rows)
+
     def create_team(self):
         org = self.select_org()
         name = input("Team name: ").strip()
@@ -182,6 +199,31 @@ class ForgejoClass:
         if not selected:
             raise ForgejoException("No repository selected.")
         return selected[0]
+
+    def find_repo(self):
+        full_name = self._get_repo_from_file()
+        response = self._api("GET", f"/repos/{full_name}")
+        self._check(response, 200, f"get repository '{full_name}'")
+        repo = response.json()
+
+        teams_text = "-"
+        if repo.get("owner", {}).get("username") != self.username():
+            response = self._api("GET", f"/repos/{full_name}/teams")
+            self._check(response, 200, f"list teams of '{full_name}'")
+            teams = [f"{t['name']} ({t.get('permission', '')})" for t in response.json()]
+            teams_text = ", ".join(teams) or "-"
+
+        rows = [
+            ["Repo", repo["full_name"]],
+            ["Teams", teams_text],
+            ["Visibility", "private" if repo.get("private") else "public"],
+            ["Default branch", repo.get("default_branch", "")],
+            ["Description", repo.get("description", "")],
+            ["Updated", repo.get("updated_at", "")],
+            ["Web", repo.get("html_url", "")],
+            ["SSH", repo.get("ssh_url", "")],
+        ]
+        pretty_table(f"Repo {full_name}", ["Field", "Value"], rows)
 
     def create_repo_from_folder(self):
         folder_name = os.path.basename(os.getcwd())

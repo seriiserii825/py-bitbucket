@@ -23,9 +23,10 @@ from classes.ForgejoCloneRepo import ForgejoCloneRepo
 from classes.ForgejoCopyRemoteUrl import ForgejoCopyRemoteUrl
 from classes.ForgejoCreateRepo import ForgejoCreateRepo
 from classes.ForgejoCreateTeam import ForgejoCreateTeam
-from classes.ForgejoDeleteRepo import ForgejoDeleteRepo
 from classes.ForgejoDeleteRepos import ForgejoDeleteRepos
+from classes.ForgejoFindRepo import ForgejoFindRepo
 from classes.ForgejoListTeams import ForgejoListTeams
+from classes.ForgejoListTeamRepos import ForgejoListTeamRepos
 from classes.ForgejoRenameRepoFromCwd import ForgejoRenameRepoFromCwd
 from classes.ForgejoReposToFile import ForgejoReposToFile
 from classes.GithubToForgejo import GithubToForgejo
@@ -127,12 +128,11 @@ def github_menu():
 def forgejo_menu():
     run_menu("Forgejo", [
         ("[magenta]Forgejo repos to CSV", ForgejoReposToFile, True),
+        ("[magenta]Find repo (fzf) - show repo info and its teams", ForgejoFindRepo, True),
         ("[magenta]Create repo on forgejo (from current folder, choose team)",
          lambda: (ForgejoCreateRepo(), ForgejoReposToFile()), False),
         ("[magenta]Clone from forgejo", ForgejoCloneRepo, False),
-        ("[red]Delete repo on forgejo",
-         lambda: (ForgejoDeleteRepo(), ForgejoReposToFile()), False),
-        ("[red]Delete multiple repos on forgejo",
+        ("[red]Delete repos on forgejo (multiple)",
          lambda: (ForgejoDeleteRepos(), ForgejoReposToFile()), False),
         ("[magenta]Rename repo on forgejo (from current folder, checks folder matches repo)",
          lambda: (ForgejoRenameRepoFromCwd(), ForgejoReposToFile()), False),
@@ -143,6 +143,7 @@ def forgejo_menu():
         ("[magenta]From bitbucket to forgejo",
          lambda: (BitbucketToForgejo(), ForgejoReposToFile()), False),
         ("[cyan]List teams (organization)", ForgejoListTeams, True),
+        ("[cyan]List repos of a team", ForgejoListTeamRepos, True),
         ("[cyan]Create new team (organization)", ForgejoCreateTeam, True),
         ("[yellow]Back", None, False),
         ("[red]Exit", exit_program, False),

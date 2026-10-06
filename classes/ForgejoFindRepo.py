@@ -3,14 +3,14 @@ from execeptions.ForgejoException import ForgejoException
 from utils import pretty_print
 
 
-class ForgejoDeleteRepo:
+class ForgejoFindRepo:
     def __init__(self):
         self.start()
 
     def start(self):
-        pretty_print("Deleting a repository on Forgejo...")
+        pretty_print("Find a Forgejo repo and show its teams...")
         fj = ForgejoClass()
         try:
-            fj.delete_repo()
+            fj.find_repo()
         except ForgejoException as e:
             pretty_print(f"Error: {e}", error=True)
