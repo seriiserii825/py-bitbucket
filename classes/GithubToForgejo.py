@@ -22,10 +22,8 @@ class GithubToForgejo:
         try:
             repo_name = self._clone_mirror_from_github()
             os.chdir(f"{repo_name}.git")
-            if fj.repo_exists(repo_name):
-                raise ForgejoException(f"Repository {repo_name} already exists on Forgejo.")
-            fj.create_repo_by_arg(repo_name)
-            fj.push_mirror(repo_name)
+            full_name = fj.create_repo_by_arg(repo_name)
+            fj.push_mirror(full_name)
         except (ForgejoException, GithubException) as e:
             pretty_print(f"Error: {e}", error=True)
 

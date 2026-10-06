@@ -1,5 +1,6 @@
 import csv
 import os
+import re
 import subprocess
 from pathlib import Path
 from urllib.parse import urlparse
@@ -10,12 +11,31 @@ from pyfzf.pyfzf import FzfPrompt
 from rich import print
 
 from execeptions.ForgejoException import ForgejoException
-from utils import pretty_print, selectMultiple
+from utils import pretty_print, pretty_table, selectMultiple, selectOne
 
 fzf = FzfPrompt()
 
+# repo units a newly created team gets access to
+TEAM_UNITS = [
+    "repo.code",
+    "repo.issues",
+    "repo.ext_issues",
+    "repo.wiki",
+    "repo.ext_wiki",
+    "repo.pulls",
+    "repo.releases",
+    "repo.projects",
+    "repo.packages",
+    "repo.actions",
+]
+
 
 class ForgejoClass:
+    """
+    Repos are identified by their full name "owner/name", because a repo
+    can belong either to the user or to the organization.
+    """
+
     def __init__(self):
         self.ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.file_path = os.path.join(self.ROOT_DIR, "forgejo_repos.csv")
@@ -43,37 +63,103 @@ class ForgejoClass:
         except requests.RequestException as e:
             raise ForgejoException(f"Request to {url} failed: {e}")
 
-    @staticmethod
-    def _error_message(response: requests.Response) -> str:
+    def _check(self, response: requests.Response, expected: int, action: str):
+        if response.status_code == expected:
+            return
         try:
-            return response.json().get("message", "Unknown error")
+            message = response.json().get("message", "Unknown error")
         except ValueError:
-            return response.text or "Unknown error"
+            message = response.text or "Unknown error"
+        raise ForgejoException(f"Failed to {action}: {response.status_code} - {message}")
 
-    def ssh_url(self, repo_name: str) -> str:
+    def _get_paginated(self, path: str, action: str) -> list:
+        items: list = []
+        page = 1
+        while True:
+            response = self._api("GET", path, params={"page": page, "limit": 50})
+            self._check(response, 200, action)
+            batch = response.json()
+            if not batch:
+                return items
+            items.extend(batch)
+            page += 1
+
+    def ssh_url(self, full_name: str) -> str:
         host = urlparse(self._base_url()).hostname
-        return f"git@{host}:{self.username()}/{repo_name}.git"
+        return f"git@{host}:{full_name}.git"
+
+    # ---------- organization / teams ----------
+
+    def select_org(self) -> str:
+        orgs = [o["username"] for o in self._get_paginated("/user/orgs", "list organizations")]
+        if not orgs:
+            raise ForgejoException("You are not a member of any organization.")
+        if len(orgs) == 1:
+            return orgs[0]
+        return selectOne(orgs)
+
+    def get_teams(self, org: str) -> list:
+        return self._get_paginated(f"/orgs/{org}/teams", "list teams")
+
+    def list_teams(self):
+        org = self.select_org()
+        teams = self.get_teams(org)
+        rows = []
+        for t in teams:
+            repos = self._get_paginated(f"/teams/{t['id']}/repos", f"list repos of team {t['name']}")
+            repos_text = "all" if t.get("includes_all_repositories") else str(len(repos))
+            rows.append([t["name"], t.get("permission", ""), repos_text, t.get("description", "")])
+        pretty_table(f"Teams in {org}", ["Name", "Permission", "Repos", "Description"], rows)
+
+    def create_team(self):
+        org = self.select_org()
+        name = input("Team name: ").strip()
+        if not name:
+            raise ForgejoException("Team name cannot be empty.")
+        description = input("Description (optional): ").strip()
+        print("[yellow]Permission for team members on the team's repos:")
+        permission = selectOne(["write", "read", "admin"])
+        data = {
+            "name": name,
+            "description": description,
+            "permission": permission,
+            "units": TEAM_UNITS,
+            "includes_all_repositories": False,
+            "can_create_org_repo": False,
+        }
+        response = self._api("POST", f"/orgs/{org}/teams", json=data)
+        self._check(response, 201, f"create team '{name}'")
+        print(f"✅ Team '{name}' ({permission}) created in '{org}'.")
+        print(f"🔗 Add members: {self._base_url()}/org/{org}/teams/{name.lower()}")
+
+    def _choose_owner(self) -> tuple[str, dict | None]:
+        """
+        Returns (owner, team): either the user's own account (team None)
+        or the organization plus the team the repo should be added to.
+        """
+        username = self.username()
+        org = self.select_org()
+        teams = self.get_teams(org)
+        personal = f"Personal ({username})"
+        options = [f"{org} / team: {t['name']}" for t in teams] + [personal]
+        print("[yellow]Where to create the repository?")
+        choice = selectOne(options)
+        if choice == personal:
+            return username, None
+        return org, teams[options.index(choice)]
+
+    # ---------- repos ----------
 
     def export_repos_to_csv(self):
         pretty_print("Fetching repositories from Forgejo...")
-        names = []
-        page = 1
-        while True:
-            response = self._api("GET", "/user/repos", params={"page": page, "limit": 50})
-            if response.status_code != 200:
-                raise ForgejoException(
-                    f"Failed to list repositories: {response.status_code} "
-                    f"- {self._error_message(response)}"
-                )
-            batch = response.json()
-            if not batch:
-                break
-            names.extend(repo["name"] for repo in batch)
-            page += 1
+        repos = self._get_paginated("/user/repos", "list repositories")
+        for org in self._get_paginated("/user/orgs", "list organizations"):
+            repos += self._get_paginated(f"/orgs/{org['username']}/repos", "list organization repositories")
+        names = sorted({repo["full_name"] for repo in repos})
 
         with open(self.file_path, mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["Name"])
+            writer.writerow(["FullName"])
             for name in names:
                 writer.writerow([name])
         pretty_print(f"Saved {len(names)} repositories to {self.file_path}")
@@ -87,6 +173,8 @@ class ForgejoClass:
             repos = [row[0] for row in reader if row]
         if not repos:
             raise ForgejoException("No repositories found in the file.")
+        if any("/" not in r for r in repos):
+            raise ForgejoException("forgejo_repos.csv is outdated. Run 'Forgejo repos to CSV' again.")
         return repos
 
     def _get_repo_from_file(self) -> str:
@@ -94,10 +182,6 @@ class ForgejoClass:
         if not selected:
             raise ForgejoException("No repository selected.")
         return selected[0]
-
-    def repo_exists(self, repo_name: str) -> bool:
-        response = self._api("GET", f"/repos/{self.username()}/{repo_name}")
-        return response.status_code == 200
 
     def create_repo_from_folder(self):
         folder_name = os.path.basename(os.getcwd())
@@ -108,32 +192,37 @@ class ForgejoClass:
         )
         if agree != "y":
             raise ForgejoException("Exiting without creating repository.")
-        self._create_repo(folder_name)
-        self._push_created_repo(folder_name)
+        full_name = self.create_repo_by_arg(folder_name)
+        self._push_created_repo(full_name)
 
-    def create_repo_by_arg(self, repo_name: str):
-        self._create_repo(repo_name)
-
-    def _create_repo(self, repo_name: str):
+    def create_repo_by_arg(self, repo_name: str) -> str:
+        """Creates the repo (asks owner/team and visibility), returns its full name."""
+        owner, team = self._choose_owner()
         is_private = input("Make repository private? (y/n): ").strip().lower() == "y"
         repo_data = {
             "name": repo_name,
             "description": "Created via Python script",
             "private": is_private,
         }
-        response = self._api("POST", "/user/repos", json=repo_data)
-        if response.status_code == 201:
-            print(f"✅ Repository '{repo_name}' created successfully.")
-            print(f"🔗 URL: {response.json().get('html_url')}")
-        else:
-            raise ForgejoException(
-                f"Error creating repository: {response.status_code} "
-                f"- {self._error_message(response)}"
-            )
+        path = "/user/repos" if team is None else f"/orgs/{owner}/repos"
+        response = self._api("POST", path, json=repo_data)
+        self._check(response, 201, f"create repository '{repo_name}'")
+        full_name = response.json()["full_name"]
+        print(f"✅ Repository '{full_name}' created successfully.")
+        print(f"🔗 URL: {response.json().get('html_url')}")
 
-    def _push_created_repo(self, repo_name: str):
+        if team is not None:
+            if team.get("includes_all_repositories"):
+                print(f"Team '{team['name']}' already has access to all repositories.")
+            else:
+                response = self._api("PUT", f"/teams/{team['id']}/repos/{full_name}")
+                self._check(response, 204, f"add '{full_name}' to team '{team['name']}'")
+                print(f"👥 Added to team '{team['name']}'.")
+        return full_name
+
+    def _push_created_repo(self, full_name: str):
         try:
-            repo_url = self.ssh_url(repo_name)
+            repo_url = self.ssh_url(full_name)
             os.system("touch README.md")
             subprocess.run(["git", "init"], check=True)
             subprocess.run(["git", "add", "."], check=True)
@@ -146,8 +235,7 @@ class ForgejoClass:
             print("❌ Git command failed:", e)
 
     def clone_repo(self):
-        repo_name = self._get_repo_from_file()
-        clone_url = self.ssh_url(repo_name)
+        clone_url = self.ssh_url(self._get_repo_from_file())
         try:
             subprocess.run(["git", "clone", clone_url], check=True)
             pretty_print(f"🔗 URL: {clone_url}")
@@ -155,31 +243,21 @@ class ForgejoClass:
             raise ForgejoException(f"Failed to clone repository: {e}")
 
     def delete_repos(self):
-        pretty_print("Deleting multiple repositories on Forgejo...")
         selected_repos = selectMultiple(self._get_repos_from_file())
         if not selected_repos:
             raise ForgejoException("No repositories selected for deletion.")
         pretty_print(f"Selected repositories for deletion: {selected_repos}")
-        for repo_name in selected_repos:
-            self.delete_repo(repo_name)
+        for full_name in selected_repos:
+            self.delete_repo(full_name)
 
-    def delete_repo(self, repo_name_arg: str = ""):
-        repo_name = repo_name_arg or self._get_repo_from_file()
-        response = self._api("DELETE", f"/repos/{self.username()}/{repo_name}")
-        if response.status_code == 204:
-            print(f"✅ Repository '{repo_name}' deleted successfully.")
-        elif response.status_code == 404:
-            raise ForgejoException(f"Repository '{repo_name}' not found or insufficient permissions.")
-        else:
-            raise ForgejoException(
-                f"Failed to delete repository '{repo_name}': {response.status_code} "
-                f"- {self._error_message(response)}"
-            )
+    def delete_repo(self, full_name_arg: str = ""):
+        full_name = full_name_arg or self._get_repo_from_file()
+        response = self._api("DELETE", f"/repos/{full_name}")
+        self._check(response, 204, f"delete repository '{full_name}'")
+        print(f"✅ Repository '{full_name}' deleted successfully.")
 
     def rename_repo_from_cwd(self):
         pretty_print("Renaming repository from current folder...")
-        username = self.username()
-
         try:
             result = subprocess.run(
                 ["git", "remote", "get-url", "origin"],
@@ -189,7 +267,9 @@ class ForgejoClass:
             raise ForgejoException("No git remote 'origin' found in current directory.")
 
         remote_url = result.stdout.strip()
-        repo_name = remote_url.rstrip("/").split("/")[-1].removesuffix(".git")
+        # git@host:owner/repo.git or https://host/owner/repo.git
+        parts = re.split(r"[:/]", remote_url.rstrip("/"))
+        owner, repo_name = parts[-2], parts[-1].removesuffix(".git")
 
         current_dir = os.getcwd()
         folder_name = os.path.basename(current_dir)
@@ -199,27 +279,20 @@ class ForgejoClass:
                 f"the Forgejo repository name '{repo_name}'. "
                 "Make sure you are running this from the correct repo folder."
             )
-        pretty_print(f"Current repo: {repo_name}")
+        pretty_print(f"Current repo: {owner}/{repo_name}")
 
         new_name = input(f"Enter new name for '{repo_name}': ").strip()
         if not new_name:
             raise ForgejoException("New repository name cannot be empty.")
 
-        response = self._api("PATCH", f"/repos/{username}/{repo_name}", json={"name": new_name})
-        if response.status_code == 200:
-            print(f"✅ Repository '{repo_name}' renamed to '{new_name}' successfully.")
-        elif response.status_code == 404:
-            raise ForgejoException("Repository not found or insufficient permissions.")
-        else:
-            raise ForgejoException(
-                f"Failed to rename repository: {response.status_code} "
-                f"- {self._error_message(response)}"
-            )
+        response = self._api("PATCH", f"/repos/{owner}/{repo_name}", json={"name": new_name})
+        self._check(response, 200, "rename repository")
+        print(f"✅ Repository '{repo_name}' renamed to '{new_name}' successfully.")
 
         if remote_url.startswith("git@"):
-            new_remote_url = self.ssh_url(new_name)
+            new_remote_url = self.ssh_url(f"{owner}/{new_name}")
         else:
-            new_remote_url = f"{self._base_url()}/{username}/{new_name}.git"
+            new_remote_url = f"{self._base_url()}/{owner}/{new_name}.git"
         subprocess.run(["git", "remote", "set-url", "origin", new_remote_url], check=True)
         print(f"🔗 Remote updated to: {new_remote_url}")
 
@@ -231,10 +304,10 @@ class ForgejoClass:
         os.rename(current_dir, new_dir)
         print(f"📁 Local folder renamed to: {new_dir}")
 
-    def push_mirror(self, repo_name: str):
-        repo_url = self.ssh_url(repo_name)
+    def push_mirror(self, full_name: str):
+        repo_url = self.ssh_url(full_name)
         try:
             subprocess.run(["git", "push", "--mirror", repo_url], check=True)
-            print(f"✅ Successfully pushed mirror to Forgejo: {repo_name}")
+            print(f"✅ Successfully pushed mirror to Forgejo: {full_name}")
         except subprocess.CalledProcessError as e:
             raise ForgejoException(f"Failed to push mirror to Forgejo: {e}")

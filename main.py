@@ -22,8 +22,10 @@ from classes.BitbucketToForgejo import BitbucketToForgejo
 from classes.ForgejoCloneRepo import ForgejoCloneRepo
 from classes.ForgejoCopyRemoteUrl import ForgejoCopyRemoteUrl
 from classes.ForgejoCreateRepo import ForgejoCreateRepo
+from classes.ForgejoCreateTeam import ForgejoCreateTeam
 from classes.ForgejoDeleteRepo import ForgejoDeleteRepo
 from classes.ForgejoDeleteRepos import ForgejoDeleteRepos
+from classes.ForgejoListTeams import ForgejoListTeams
 from classes.ForgejoRenameRepoFromCwd import ForgejoRenameRepoFromCwd
 from classes.ForgejoReposToFile import ForgejoReposToFile
 from classes.GithubToForgejo import GithubToForgejo
@@ -125,7 +127,7 @@ def github_menu():
 def forgejo_menu():
     run_menu("Forgejo", [
         ("[magenta]Forgejo repos to CSV", ForgejoReposToFile, True),
-        ("[magenta]Create repo on forgejo (from current folder)",
+        ("[magenta]Create repo on forgejo (from current folder, choose team)",
          lambda: (ForgejoCreateRepo(), ForgejoReposToFile()), False),
         ("[magenta]Clone from forgejo", ForgejoCloneRepo, False),
         ("[red]Delete repo on forgejo",
@@ -140,6 +142,8 @@ def forgejo_menu():
          lambda: (GithubToForgejo(), ForgejoReposToFile()), False),
         ("[magenta]From bitbucket to forgejo",
          lambda: (BitbucketToForgejo(), ForgejoReposToFile()), False),
+        ("[cyan]List teams (organization)", ForgejoListTeams, True),
+        ("[cyan]Create new team (organization)", ForgejoCreateTeam, True),
         ("[yellow]Back", None, False),
         ("[red]Exit", exit_program, False),
     ])
