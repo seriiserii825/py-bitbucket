@@ -18,7 +18,7 @@ from classes.BitbucketCopyRemoteUrl import BitbucketCopyRemoteUrl
 from classes.GithubCopyRemoteUrl import GithubCopyRemoteUrl
 from classes.GithubRenameRepoFromCwd import GithubRenameRepoFromCwd
 from classes.GithubReposToFile import GithubReposToFile
-from py_libs.Select import Select
+from py_libs.Menu import Menu
 
 
 def confirm_repo_already_created(destination: str, create_option: str) -> bool:
@@ -53,41 +53,38 @@ def migrate_to_bitbucket():
 def menu():
     # (label, action, return to menu after action)
     options = [
-        ("Bitbucket repos to File", BitbucketReposToFile, True),
-        ("Clone and Mirror Bitbucket Repo to Bitbucket",
+        ("[blue]Bitbucket repos to File", BitbucketReposToFile, True),
+        ("[blue]Clone and Mirror Bitbucket Repo to Bitbucket",
          lambda: (BitbucketPlaywrightMirror(), BitbucketReposToFile()), False),
-        ("Find Repo in bitbucket File", BitbucketFindRepoInFile, True),
-        ("Create new repo on bitbucket",
+        ("[blue]Find Repo in bitbucket File", BitbucketFindRepoInFile, True),
+        ("[blue]Create new repo on bitbucket",
          lambda: (BitbucketPlaywrightCreateRepo(), BitbucketReposToFile()), False),
-        ("Delete repo on bitbucket",
+        ("[blue]Delete repo on bitbucket",
          lambda: (BitbucketDeleteRepo(), BitbucketReposToFile()), False),
-        ("Delete multiple repos on bitbucket",
+        ("[red]Delete multiple repos on bitbucket",
          lambda: (BitbucketDeleteRepos(), BitbucketReposToFile()), False),
-        ("Clone repo on bitbucket", BitbucketClone, False),
-        ("Copy/set/add remote origin URL (Bitbucket) to clipboard",
+        ("[blue]Clone repo on bitbucket", BitbucketClone, False),
+        ("[blue]Copy/set/add remote origin URL (Bitbucket) to clipboard",
          BitbucketCopyRemoteUrl, True),
-        ("From github to csv", GithubReposToFile, False),
-        ("Create repo on github",
+        ("[green]From github to csv", GithubReposToFile, False),
+        ("[green]Create repo on github",
          lambda: (GithubCreateRepoOnGithub(), GithubReposToFile()), False),
-        ("Clone from github", GithubCloneRepo, False),
-        ("Delete repo on github",
+        ("[green]Clone from github", GithubCloneRepo, False),
+        ("[red]Delete repo on github",
          lambda: (GithubDeleteRepo(), GithubReposToFile()), False),
-        ("Delete mutliple repos on github",
+        ("[red]Delete mutliple repos on github",
          lambda: (GithubDeleteRepos(), GithubReposToFile()), False),
-        ("From bitbucket to github", migrate_to_github, False),
-        ("From github to bitbucket", migrate_to_bitbucket, False),
-        ("Rename repo on github (from current folder, checks folder matches repo)",
+        ("[green]From bitbucket to github", migrate_to_github, False),
+        ("[green]From github to bitbucket", migrate_to_bitbucket, False),
+        ("[green]Rename repo on github (from current folder, checks folder matches repo)",
          lambda: (GithubRenameRepoFromCwd(), GithubReposToFile()), False),
-        ("Copy/set/add remote origin URL (GitHub) to clipboard",
+        ("[green]Copy/set/add remote origin URL (GitHub) to clipboard",
          GithubCopyRemoteUrl, True),
-        ("Exit", None, False),
+        ("[red]Exit", None, False),
     ]
-    labels = [label for label, _, _ in options]
-    choice = Select.select_fzf_one(labels)
-    if choice is None or choice not in labels:
-        print("[red]Exiting the program...")
-        exit(0)
-    _, action, back_to_menu = options[labels.index(choice)]
+    rows = [[str(i), label] for i, (label, _, _) in enumerate(options)]
+    Menu.display("Main menu", ["#", "Option"], rows)
+    _, action, back_to_menu = options[Menu.choose_option()]
     if action is None:
         print("[red]Exiting the program...")
         exit(0)
