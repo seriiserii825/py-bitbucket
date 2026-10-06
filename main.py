@@ -21,38 +21,59 @@ from classes.GithubReposToFile import GithubReposToFile
 from py_libs.Menu import Menu
 
 
-def confirm_repo_already_created(destination: str, create_option: str) -> bool:
+def confirm_repo_already_created(destination: str) -> bool:
     print(f"[yellow]Have you already created the new repo on {destination}?")
     print(
         f"[yellow]You can create a repo on {destination} from this script "
-        f"(option {create_option} in the main menu)."
+        f"(\"Create repo\" in the {destination} menu)."
     )
     answer = input("Continue with migration? (y/n): ").strip().lower()
     if answer == "y":
         return True
-    print(f"[yellow]Redirecting to the main menu so you can create the repo on {destination} first...")
+    print(f"[yellow]Back to the {destination} menu so you can create the repo first...")
     return False
 
 
-def migrate_to_github():
-    if confirm_repo_already_created("GitHub", "Create repo on github"):
-        BitbucketToGithub()
-        GithubReposToFile()
-    else:
-        menu()
+def migrate_to_github() -> bool:
+    if not confirm_repo_already_created("GitHub"):
+        return False
+    BitbucketToGithub()
+    GithubReposToFile()
+    return True
 
 
-def migrate_to_bitbucket():
-    if confirm_repo_already_created("Bitbucket", "Create new repo on bitbucket"):
-        GithubToBitbucket()
-        BitbucketReposToFile()
-    else:
-        menu()
+def migrate_to_bitbucket() -> bool:
+    if not confirm_repo_already_created("Bitbucket"):
+        return False
+    GithubToBitbucket()
+    BitbucketReposToFile()
+    return True
 
 
-def menu():
-    # (label, action, return to menu after action)
-    options = [
+def exit_program():
+    print("[red]Exiting the program...")
+    exit(0)
+
+
+def run_menu(title: str, options) -> None:
+    """
+    options: list of (label, action, return to this menu after action).
+    action None means "Back" (return to the caller).
+    An action returning False also returns to this menu.
+    """
+    while True:
+        rows = [[str(i), label] for i, (label, _, _) in enumerate(options)]
+        Menu.display(title, ["#", "Option"], rows)
+        _, action, back_to_menu = options[Menu.choose_option()]
+        if action is None:
+            return
+        result = action()
+        if not back_to_menu and result is not False:
+            exit(0)
+
+
+def bitbucket_menu():
+    run_menu("Bitbucket", [
         ("[blue]Bitbucket repos to File", BitbucketReposToFile, True),
         ("[blue]Clone and Mirror Bitbucket Repo to Bitbucket",
          lambda: (BitbucketPlaywrightMirror(), BitbucketReposToFile()), False),
@@ -66,6 +87,14 @@ def menu():
         ("[blue]Clone repo on bitbucket", BitbucketClone, False),
         ("[blue]Copy/set/add remote origin URL (Bitbucket) to clipboard",
          BitbucketCopyRemoteUrl, True),
+        ("[blue]From github to bitbucket", migrate_to_bitbucket, False),
+        ("[yellow]Back", None, False),
+        ("[red]Exit", exit_program, False),
+    ])
+
+
+def github_menu():
+    run_menu("GitHub", [
         ("[green]From github to csv", GithubReposToFile, False),
         ("[green]Create repo on github",
          lambda: (GithubCreateRepoOnGithub(), GithubReposToFile()), False),
@@ -75,22 +104,21 @@ def menu():
         ("[red]Delete mutliple repos on github",
          lambda: (GithubDeleteRepos(), GithubReposToFile()), False),
         ("[green]From bitbucket to github", migrate_to_github, False),
-        ("[green]From github to bitbucket", migrate_to_bitbucket, False),
         ("[green]Rename repo on github (from current folder, checks folder matches repo)",
          lambda: (GithubRenameRepoFromCwd(), GithubReposToFile()), False),
         ("[green]Copy/set/add remote origin URL (GitHub) to clipboard",
          GithubCopyRemoteUrl, True),
-        ("[red]Exit", None, False),
-    ]
-    rows = [[str(i), label] for i, (label, _, _) in enumerate(options)]
-    Menu.display("Main menu", ["#", "Option"], rows)
-    _, action, back_to_menu = options[Menu.choose_option()]
-    if action is None:
-        print("[red]Exiting the program...")
-        exit(0)
-    action()
-    if back_to_menu:
-        menu()
+        ("[yellow]Back", None, False),
+        ("[red]Exit", exit_program, False),
+    ])
+
+
+def menu():
+    run_menu("Main menu", [
+        ("[green]GitHub", github_menu, True),
+        ("[blue]Bitbucket", bitbucket_menu, True),
+        ("[red]Exit", exit_program, False),
+    ])
 
 
 if __name__ == "__main__":
