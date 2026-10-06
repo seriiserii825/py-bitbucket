@@ -18,6 +18,15 @@ from classes.BitbucketCopyRemoteUrl import BitbucketCopyRemoteUrl
 from classes.GithubCopyRemoteUrl import GithubCopyRemoteUrl
 from classes.GithubRenameRepoFromCwd import GithubRenameRepoFromCwd
 from classes.GithubReposToFile import GithubReposToFile
+from classes.BitbucketToForgejo import BitbucketToForgejo
+from classes.ForgejoCloneRepo import ForgejoCloneRepo
+from classes.ForgejoCopyRemoteUrl import ForgejoCopyRemoteUrl
+from classes.ForgejoCreateRepo import ForgejoCreateRepo
+from classes.ForgejoDeleteRepo import ForgejoDeleteRepo
+from classes.ForgejoDeleteRepos import ForgejoDeleteRepos
+from classes.ForgejoRenameRepoFromCwd import ForgejoRenameRepoFromCwd
+from classes.ForgejoReposToFile import ForgejoReposToFile
+from classes.GithubToForgejo import GithubToForgejo
 from py_libs.Menu import Menu
 
 
@@ -113,10 +122,34 @@ def github_menu():
     ])
 
 
+def forgejo_menu():
+    run_menu("Forgejo", [
+        ("[magenta]Forgejo repos to CSV", ForgejoReposToFile, True),
+        ("[magenta]Create repo on forgejo (from current folder)",
+         lambda: (ForgejoCreateRepo(), ForgejoReposToFile()), False),
+        ("[magenta]Clone from forgejo", ForgejoCloneRepo, False),
+        ("[red]Delete repo on forgejo",
+         lambda: (ForgejoDeleteRepo(), ForgejoReposToFile()), False),
+        ("[red]Delete multiple repos on forgejo",
+         lambda: (ForgejoDeleteRepos(), ForgejoReposToFile()), False),
+        ("[magenta]Rename repo on forgejo (from current folder, checks folder matches repo)",
+         lambda: (ForgejoRenameRepoFromCwd(), ForgejoReposToFile()), False),
+        ("[magenta]Copy/set/add remote origin URL (Forgejo) to clipboard",
+         ForgejoCopyRemoteUrl, True),
+        ("[magenta]From github to forgejo",
+         lambda: (GithubToForgejo(), ForgejoReposToFile()), False),
+        ("[magenta]From bitbucket to forgejo",
+         lambda: (BitbucketToForgejo(), ForgejoReposToFile()), False),
+        ("[yellow]Back", None, False),
+        ("[red]Exit", exit_program, False),
+    ])
+
+
 def menu():
     run_menu("Main menu", [
         ("[green]GitHub", github_menu, True),
         ("[blue]Bitbucket", bitbucket_menu, True),
+        ("[magenta]Forgejo", forgejo_menu, True),
         ("[red]Exit", exit_program, False),
     ])
 
