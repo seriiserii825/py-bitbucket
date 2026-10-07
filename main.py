@@ -18,6 +18,7 @@ from classes.BitbucketCopyRemoteUrl import BitbucketCopyRemoteUrl
 from classes.GithubCopyRemoteUrl import GithubCopyRemoteUrl
 from classes.GithubRenameRepoFromCwd import GithubRenameRepoFromCwd
 from classes.GithubReposToFile import GithubReposToFile
+from classes.GithubTogglePrivate import GithubTogglePrivate
 from classes.BitbucketToForgejo import BitbucketToForgejo
 from classes.ForgejoCloneRepo import ForgejoCloneRepo
 from classes.ForgejoCopyRemoteUrl import ForgejoCopyRemoteUrl
@@ -120,6 +121,7 @@ def github_menu():
          lambda: (GithubRenameRepoFromCwd(), GithubReposToFile()), False),
         ("[green]Copy/set/add remote origin URL (GitHub) to clipboard",
          GithubCopyRemoteUrl, True),
+        ("[green]Toggle private/public mode of repo (fzf)", GithubTogglePrivate, True),
         ("[yellow]Back", None, False),
         ("[red]Exit", exit_program, False),
     ])

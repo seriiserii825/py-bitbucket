@@ -329,6 +329,48 @@ class GithubClass:
         os.rename(current_dir, new_dir)
         print(f"📁 Local folder renamed to: {new_dir}")
 
+    def toggle_private(self):
+        pretty_print("Toggling private mode of a repository on GitHub...")
+        token = self._get_data_from_env("GITHUB_TOKEN")
+        username = self._get_data_from_env("GITHUB_USERNAME")
+
+        selected = self._get_repo_from_file()
+        if not selected:
+            raise GithubException("No repository selected.")
+        repo_name = selected[0]
+
+        url = f"https://api.github.com/repos/{username}/{repo_name}"
+        headers = {"Accept": "application/vnd.github.v3+json"}
+        response = requests.get(url, auth=(username, token), headers=headers)
+        if response.status_code == 404:
+            raise GithubException("Repository not found or insufficient permissions.")
+        if response.status_code != 200:
+            raise GithubException(
+                f"Failed to get repository: {response.status_code} "
+                f"- {response.json().get('message', 'Unknown error')}"
+            )
+
+        is_private = response.json()["private"]
+        current = "[red]private" if is_private else "[green]public"
+        target = "public" if is_private else "private"
+        print(f"Repository '{repo_name}' is {current}")
+
+        agree = input(f"Make it {target}? (y/n): ").strip().lower()
+        if agree != "y":
+            print("[yellow]Nothing changed.")
+            return
+
+        response = requests.patch(
+            url, json={"private": not is_private}, auth=(username, token), headers=headers
+        )
+        if response.status_code == 200:
+            print(f"✅ Repository '{repo_name}' is now {target}.")
+        else:
+            raise GithubException(
+                f"Failed to change visibility: {response.status_code} "
+                f"- {response.json().get('message', 'Unknown error')}"
+            )
+
     def check_repo_on_github(self, repo_name: str) -> bool:
         repos = self._get_repos_from_file()
         return repo_name in repos
