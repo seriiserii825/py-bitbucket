@@ -5,7 +5,8 @@ from utils import pretty_print, selectOne
 
 
 class GithubCopyRemoteUrl:
-    def __init__(self):
+    def __init__(self, action: str | None = None):
+        self.action = action
         self.start()
 
     def start(self):
@@ -14,7 +15,7 @@ class GithubCopyRemoteUrl:
             username = gh._get_data_from_env("GITHUB_USERNAME")
             repo_name = gh._get_repo_from_file()[0]
             remote_url = f"git@github.com:{username}/{repo_name}.git"
-            action = selectOne(["url only", "set", "add"])
+            action = self.action or selectOne(["url only", "set", "add"])
             if action == "url only":
                 clipboard_text = remote_url
             else:

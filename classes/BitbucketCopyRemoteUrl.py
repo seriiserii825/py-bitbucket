@@ -5,7 +5,8 @@ from utils import pretty_print, selectOne
 
 
 class BitbucketCopyRemoteUrl:
-    def __init__(self):
+    def __init__(self, action: str | None = None):
+        self.action = action
         self.start()
 
     def start(self):
@@ -13,7 +14,7 @@ class BitbucketCopyRemoteUrl:
         try:
             repo = bb.get_repo_from_file()
             remote_url = f"git@bitbucket.org:{repo.workspace}/{repo.name}.git"
-            action = selectOne(["url only", "set", "add"])
+            action = self.action or selectOne(["url only", "set", "add"])
             if action == "url only":
                 clipboard_text = remote_url
             else:

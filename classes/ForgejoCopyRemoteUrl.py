@@ -5,14 +5,15 @@ from utils import pretty_print, selectOne
 
 
 class ForgejoCopyRemoteUrl:
-    def __init__(self):
+    def __init__(self, action: str | None = None):
+        self.action = action
         self.start()
 
     def start(self):
         fj = ForgejoClass()
         try:
             remote_url = fj.ssh_url(fj._get_repo_from_file())
-            action = selectOne(["url only", "set", "add"])
+            action = self.action or selectOne(["url only", "set", "add"])
             if action == "url only":
                 clipboard_text = remote_url
             else:
