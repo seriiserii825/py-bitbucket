@@ -8,7 +8,7 @@ from pathlib import Path
 from rich import print
 from execeptions.GithubException import GithubException
 from modules.git_mirror import clone_mirror_from_bitbucket
-from utils import choose_repo_name, confirm_push_current_folder, pretty_print, selectMultiple
+from utils import choose_repo_name, pretty_print, selectMultiple
 from pyfzf.pyfzf import FzfPrompt
 
 
@@ -94,7 +94,7 @@ class GithubClass:
         except ValueError as e:
             raise GithubException(str(e))
         self._create_repo(repo_name)
-        if confirm_push_current_folder(from_folder):
+        if from_folder:
             self._push_created_repo(repo_name)
 
     def create_repo_by_arg(self, repo_name: str):

@@ -13,7 +13,6 @@ from rich import print
 from execeptions.ForgejoException import ForgejoException
 from utils import (
     choose_repo_name,
-    confirm_push_current_folder,
     pretty_print,
     pretty_table,
     selectMultiple,
@@ -241,7 +240,7 @@ class ForgejoClass:
         except ValueError as e:
             raise ForgejoException(str(e))
         full_name = self.create_repo_by_arg(repo_name)
-        if confirm_push_current_folder(from_folder):
+        if from_folder:
             self._push_created_repo(full_name)
 
     def create_repo_by_arg(self, repo_name: str) -> str:

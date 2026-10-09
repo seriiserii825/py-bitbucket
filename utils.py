@@ -46,14 +46,3 @@ def choose_repo_name() -> tuple[str, bool]:
         raise ValueError("Repository name cannot be empty.")
     return repo_name, False
 
-
-def confirm_push_current_folder(from_folder: bool) -> bool:
-    """
-    Repo named after the current folder: push it as before.
-    Manually named repo: ask, since the current folder may be unrelated.
-    """
-    if from_folder:
-        return True
-    prompt = f"Init and push current folder '{os.getcwd()}' to the new repo?"
-    answer = input(f"{prompt} (y/n): ").strip().lower()
-    return answer == "y"

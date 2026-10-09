@@ -26,6 +26,7 @@ from classes.ForgejoCreateRepo import ForgejoCreateRepo
 from classes.ForgejoCreateTeam import ForgejoCreateTeam
 from classes.ForgejoDeleteRepos import ForgejoDeleteRepos
 from classes.ForgejoFindRepo import ForgejoFindRepo
+from classes.FindProject import FindProject
 from classes.ForgejoListTeams import ForgejoListTeams
 from classes.ForgejoListTeamRepos import ForgejoListTeamRepos
 from classes.ForgejoRenameRepoFromCwd import ForgejoRenameRepoFromCwd
@@ -160,6 +161,7 @@ def forgejo_menu():
 
 def menu():
     run_menu("Main menu", [
+        ("[cyan]Find Project (search in all repos)", FindProject, True),
         ("[green]GitHub", github_menu, True),
         ("[blue]Bitbucket", bitbucket_menu, True),
         ("[magenta]Forgejo", forgejo_menu, True),
