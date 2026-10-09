@@ -88,6 +88,9 @@ class ForgejoClass:
         host = urlparse(self._base_url()).hostname
         return f"git@{host}:{full_name}.git"
 
+    def https_url(self, full_name: str) -> str:
+        return f"{self._base_url()}/{full_name}.git"
+
     # ---------- organization / teams ----------
 
     def select_org(self) -> str:

@@ -13,7 +13,11 @@ class BitbucketCopyRemoteUrl:
         bb = Bitbucket()
         try:
             repo = bb.get_repo_from_file()
-            remote_url = f"git@bitbucket.org:{repo.workspace}/{repo.name}.git"
+            protocol = selectOne(["ssh", "https"])
+            if protocol == "ssh":
+                remote_url = f"git@bitbucket.org:{repo.workspace}/{repo.name}.git"
+            else:
+                remote_url = f"https://bitbucket.org/{repo.workspace}/{repo.name}.git"
             action = self.action or selectOne(["url only", "set", "add"])
             if action == "url only":
                 clipboard_text = remote_url

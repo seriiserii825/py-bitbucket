@@ -14,7 +14,11 @@ class GithubCopyRemoteUrl:
         try:
             username = gh._get_data_from_env("GITHUB_USERNAME")
             repo_name = gh._get_repo_from_file()[0]
-            remote_url = f"git@github.com:{username}/{repo_name}.git"
+            protocol = selectOne(["ssh", "https"])
+            if protocol == "ssh":
+                remote_url = f"git@github.com:{username}/{repo_name}.git"
+            else:
+                remote_url = f"https://github.com/{username}/{repo_name}.git"
             action = self.action or selectOne(["url only", "set", "add"])
             if action == "url only":
                 clipboard_text = remote_url

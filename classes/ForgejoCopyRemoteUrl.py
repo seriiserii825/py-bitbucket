@@ -12,7 +12,12 @@ class ForgejoCopyRemoteUrl:
     def start(self):
         fj = ForgejoClass()
         try:
-            remote_url = fj.ssh_url(fj._get_repo_from_file())
+            full_name = fj._get_repo_from_file()
+            protocol = selectOne(["ssh", "https"])
+            if protocol == "ssh":
+                remote_url = fj.ssh_url(full_name)
+            else:
+                remote_url = fj.https_url(full_name)
             action = self.action or selectOne(["url only", "set", "add"])
             if action == "url only":
                 clipboard_text = remote_url
