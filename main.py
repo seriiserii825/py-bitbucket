@@ -69,18 +69,19 @@ def exit_program():
     exit(0)
 
 
-def run_menu(title: str, options) -> None:
+def run_menu(title: str, options, exit_label: str = "[yellow]Back") -> None:
     """
     options: list of (label, action, return to this menu after action).
-    action None means "Back" (return to the caller).
+    "00) <exit_label>" or Esc returns to the caller.
     An action returning False also returns to this menu.
     """
     while True:
-        rows = [[str(i), label] for i, (label, _, _) in enumerate(options)]
-        Menu.display(title, ["#", "Option"], rows)
-        _, action, back_to_menu = options[Menu.choose_option()]
-        if action is None:
+        index = Menu.select_fzf_menu(
+            [label for label, _, _ in options], title, exit_label
+        )
+        if not index:
             return
+        _, action, back_to_menu = options[index - 1]
         result = action()
         if not back_to_menu and result is not False:
             exit(0)
@@ -104,7 +105,6 @@ def bitbucket_menu():
         ("[blue]Copy/set/add remote origin URL (Bitbucket) to clipboard",
          BitbucketCopyRemoteUrl, True),
         ("[blue]From github to bitbucket", migrate_to_bitbucket, False),
-        ("[yellow]Back", None, False),
         ("[red]Exit", exit_program, False),
     ])
 
@@ -127,7 +127,6 @@ def github_menu():
         ("[green]Copy/set/add remote origin URL (GitHub) to clipboard",
          GithubCopyRemoteUrl, True),
         ("[green]Toggle private/public mode of repo (fzf)", GithubTogglePrivate, True),
-        ("[yellow]Back", None, False),
         ("[red]Exit", exit_program, False),
     ])
 
@@ -154,7 +153,6 @@ def forgejo_menu():
         ("[cyan]List teams (organization)", ForgejoListTeams, True),
         ("[cyan]List repos of a team", ForgejoListTeamRepos, True),
         ("[cyan]Create new team (organization)", ForgejoCreateTeam, True),
-        ("[yellow]Back", None, False),
         ("[red]Exit", exit_program, False),
     ])
 
@@ -165,8 +163,8 @@ def menu():
         ("[green]GitHub", github_menu, True),
         ("[blue]Bitbucket", bitbucket_menu, True),
         ("[magenta]Forgejo", forgejo_menu, True),
-        ("[red]Exit", exit_program, False),
-    ])
+    ], exit_label="[red]Exit")
+    exit_program()
 
 
 if __name__ == "__main__":
