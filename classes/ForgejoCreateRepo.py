@@ -8,7 +8,7 @@ class ForgejoCreateRepo:
         self.start()
 
     def start(self):
-        pretty_print("Creating a new repository on Forgejo from the current folder...")
+        pretty_print("Creating a new repository on Forgejo...")
         fj = ForgejoClass()
         try:
             fj.create_repo_from_folder()

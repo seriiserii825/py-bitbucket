@@ -8,7 +8,7 @@ from pathlib import Path
 from rich import print
 from execeptions.GithubException import GithubException
 from modules.git_mirror import clone_mirror_from_bitbucket
-from utils import pretty_print, selectMultiple
+from utils import choose_repo_name, confirm_push_current_folder, pretty_print, selectMultiple
 from pyfzf.pyfzf import FzfPrompt
 
 
@@ -89,16 +89,13 @@ class GithubClass:
             print(f"❌ Failed to clone repository: {e}")
 
     def create_repo_from_folder(self):
-        folder_name = os.path.basename(os.getcwd())
-        agree = (
-            input(f"From current folder name, '{folder_name}', are you agree, (y/n): ")
-            .strip()
-            .lower()
-        )
-        if agree != "y":
-            exit("Exiting without creating repository.")
-        self._create_repo(folder_name)
-        self._push_created_repo(folder_name)
+        try:
+            repo_name, from_folder = choose_repo_name()
+        except ValueError as e:
+            raise GithubException(str(e))
+        self._create_repo(repo_name)
+        if confirm_push_current_folder(from_folder):
+            self._push_created_repo(repo_name)
 
     def create_repo_by_arg(self, repo_name: str):
         self._create_repo(repo_name)

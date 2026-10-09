@@ -11,7 +11,14 @@ from pyfzf.pyfzf import FzfPrompt
 from rich import print
 
 from execeptions.ForgejoException import ForgejoException
-from utils import pretty_print, pretty_table, selectMultiple, selectOne
+from utils import (
+    choose_repo_name,
+    confirm_push_current_folder,
+    pretty_print,
+    pretty_table,
+    selectMultiple,
+    selectOne,
+)
 
 fzf = FzfPrompt()
 
@@ -229,16 +236,13 @@ class ForgejoClass:
         pretty_table(f"Repo {full_name}", ["Field", "Value"], rows)
 
     def create_repo_from_folder(self):
-        folder_name = os.path.basename(os.getcwd())
-        agree = (
-            input(f"From current folder name, '{folder_name}', are you agree, (y/n): ")
-            .strip()
-            .lower()
-        )
-        if agree != "y":
-            raise ForgejoException("Exiting without creating repository.")
-        full_name = self.create_repo_by_arg(folder_name)
-        self._push_created_repo(full_name)
+        try:
+            repo_name, from_folder = choose_repo_name()
+        except ValueError as e:
+            raise ForgejoException(str(e))
+        full_name = self.create_repo_by_arg(repo_name)
+        if confirm_push_current_folder(from_folder):
+            self._push_created_repo(full_name)
 
     def create_repo_by_arg(self, repo_name: str) -> str:
         """Creates the repo (asks owner/team and visibility), returns its full name."""

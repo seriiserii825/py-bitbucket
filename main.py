@@ -135,7 +135,7 @@ def forgejo_menu():
     run_menu("Forgejo", [
         ("[magenta]Forgejo repos to CSV", ForgejoReposToFile, True),
         ("[magenta]Find repo (fzf) - show repo info and its teams", ForgejoFindRepo, True),
-        ("[magenta]Create repo on forgejo (from current folder, choose team)",
+        ("[magenta]Create repo on forgejo (current folder or enter name, choose team)",
          lambda: (ForgejoCreateRepo(), ForgejoReposToFile()), False),
         ("[magenta]Clone from forgejo", ForgejoCloneRepo, False),
         ("[red]Delete repos on forgejo (multiple)",

@@ -10,7 +10,7 @@ from pyfzf.pyfzf import FzfPrompt
 from execeptions.BitbucketException import BitbucketException
 from my_types.account_type import AccountType
 from my_types.repo_type import RepoType
-from utils import pretty_print, pretty_table, selectOne
+from utils import choose_repo_name, pretty_print, pretty_table, selectOne
 
 
 fzf = FzfPrompt()
@@ -209,8 +209,8 @@ class Bitbucket:
             )
 
     def set_repo_name(self) -> str:
-        pretty_print("Please enter the new repository name:")
-        repo_name = input("Enter the new repository name: ")
-        if not repo_name:
-            raise BitbucketException("Repository name cannot be empty.")
+        try:
+            repo_name, _ = choose_repo_name()
+        except ValueError as e:
+            raise BitbucketException(str(e))
         return repo_name
