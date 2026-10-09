@@ -20,7 +20,7 @@ class ForgejoCopyRemoteUrl:
                 remote_url = fj.https_url(full_name)
             action = self.action or selectOne(["url only", "set", "add"])
             if action == "url only":
-                clipboard_text = remote_url
+                clipboard_text = f"git clone {remote_url}"
             else:
                 subcommand = "set-url" if action == "set" else "add"
                 clipboard_text = f"git remote {subcommand} origin {remote_url}"

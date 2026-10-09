@@ -21,7 +21,7 @@ class GithubCopyRemoteUrl:
                 remote_url = f"https://github.com/{username}/{repo_name}.git"
             action = self.action or selectOne(["url only", "set", "add"])
             if action == "url only":
-                clipboard_text = remote_url
+                clipboard_text = f"git clone {remote_url}"
             else:
                 subcommand = "set-url" if action == "set" else "add"
                 clipboard_text = f"git remote {subcommand} origin {remote_url}"
