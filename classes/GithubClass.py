@@ -157,6 +157,42 @@ class GithubClass:
             except GithubException as e:
                 raise GithubException(f"Failed to delete repository '{repo_name}': {e}")
 
+    def delete_old_repos(self):
+        pretty_print("Deleting old repositories on GitHub (oldest first)...")
+        github_token = self._get_data_from_env("GITHUB_TOKEN")
+        g = Github(github_token)
+
+        pretty_print("Fetching repositories from GitHub...")
+        repos = g.get_user().get_repos(
+            affiliation="owner", sort="created", direction="asc"
+        )
+        lines = [
+            f"{repo.created_at:%Y-%m-%d}  {repo.name}"
+            f"{'  [private]' if repo.private else ''}"
+            for repo in repos
+        ]
+        if not lines:
+            raise GithubException("No repositories found on GitHub.")
+
+        selected = fzf.prompt(lines, "--multi --no-sort --reverse")
+        if not selected:
+            raise GithubException("No repositories selected for deletion.")
+
+        selected_repos = [line.split()[1] for line in selected]
+        print("[red]Repositories to delete:")
+        for line in selected:
+            print(f"[red]  {line}")
+        agree = input(f"Delete {len(selected_repos)} repo(s)? (y/n): ").strip().lower()
+        if agree != "y":
+            print("[yellow]Nothing deleted.")
+            return
+
+        for repo_name in selected_repos:
+            try:
+                self.delete_repo(repo_name)
+            except GithubException as e:
+                raise GithubException(f"Failed to delete repository '{repo_name}': {e}")
+
     def delete_repo(self, repo_name_arg: str = ""):
         pretty_print("Deleting a repository on GitHub...")
         token = self._get_data_from_env("GITHUB_TOKEN")

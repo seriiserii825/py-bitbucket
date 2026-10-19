@@ -14,6 +14,7 @@ from classes.GithubCloneRepo import GithubCloneRepo
 from classes.GithubCreateRepoOnGithub import GithubCreateRepoOnGithub
 from classes.GithubDeleteRepo import GithubDeleteRepo
 from classes.GithubDeleteRepos import GithubDeleteRepos
+from classes.GithubDeleteOldRepos import GithubDeleteOldRepos
 from classes.BitbucketCopyRemoteUrl import BitbucketCopyRemoteUrl
 from classes.GithubCopyRemoteUrl import GithubCopyRemoteUrl
 from classes.GithubRenameRepoFromCwd import GithubRenameRepoFromCwd
@@ -119,6 +120,8 @@ def github_menu():
          lambda: (GithubDeleteRepo(), GithubReposToFile()), False),
         ("[red]Delete mutliple repos on github",
          lambda: (GithubDeleteRepos(), GithubReposToFile()), False),
+        ("[red]Delete old repos on github (by created date, oldest first)",
+         lambda: (GithubDeleteOldRepos(), GithubReposToFile()), False),
         ("[green]From bitbucket to github", migrate_to_github, False),
         ("[green]Rename repo on github (from current folder, checks folder matches repo)",
          lambda: (GithubRenameRepoFromCwd(), GithubReposToFile()), False),
